@@ -10,80 +10,141 @@ HEADERS = {
 }
 
 BASE_URL = 'https://hardverapro.hu/aprok/notebook/pc/index.html'
-MAX_PAGES = 10  # Állítsd be, hány oldalt szeretnél (1 oldal = 100 hirdetés)
+MAX_PAGES = 5 # Állítsd be, hány oldalt töltsön le (1 oldal = 100 hirdetés)
 
-def parse_price(text):
-    if not text: return 0
-    nums = re.sub(r'\D', '', text)
-    return int(nums) if nums else 0
+def extract_specs(title, desc):
+    """Kinyeri az adatokat a weboldal által elvárt formátumban."""
+    txt = (title + ' ' + desc).lower()
+    s = {
+        'brand': 'Egyéb',
+        'screenSize': None,
+        'resolution': 'HD',
+        'ramSize': None,
+        'ssdSize': None,
+        'cpuMfr': 'Ismeretlen',
+        'cpuModel': '',
+        'gpuMfr': 'Integrált',
+        'gpuModel': ''
+    }
 
-def scrape_everything():
+    # MÁRKA
+    brands = ['lenovo', 'dell', 'hp', 'asus', 'acer', 'apple', 'msi', 'toshiba', 'fujitsu', 'huawei', 'xiaomi', 'microsoft']
+    for b in brands:
+        if b in txt:
+            s['brand'] = b.capitalize() if b != 'hp' else 'HP'
+            break
+
+    # KIJELZŐ MÉRET (számként)
+    m = re.search(r'(\d{2}(?:\.\d+)?)\s*(?:"|col|\')', txt)
+    if m:
+        s['screenSize'] = float(m.group(1))
+
+    # FELBONTÁS
+    if any(x in txt for x in ['4k', 'uhd', '3840x']): s['resolution'] = '4K'
+    elif any(x in txt for x in ['qhd', '2k', '2560x']): s['resolution'] = 'QHD'
+    elif any(x in txt for x in ['fhd', '1920x', 'full hd']): s['resolution'] = 'FHD'
+
+    # RAM (számként)
+    m = re.search(r'(\d+)\s*gb\s*(ram|ddr)?', txt)
+    if m:
+        s['ramSize'] = int(m.group(1))
+
+    # TÁRHELY (SSD/NVME - GB-ban kifejezve)
+    m = re.search(r'(\d+)\s*(gb|tb)\s*(ssd|nvme|m\.2|hdd)', txt)
+    if m:
+        size = int(m.group(1))
+        unit = m.group(2)
+        s['ssdSize'] = size * 1024 if unit == 'tb' else size
+
+    # CPU
+    if 'intel' in txt or re.search(r'i[3579]-', txt):
+        s['cpuMfr'] = 'Intel'
+        m = re.search(r'(i[3579]-?\d{4,5}[a-z]*)', txt)
+        if m: s['cpuModel'] = m.group(1).upper()
+    elif 'ryzen' in txt or 'amd' in txt:
+        s['cpuMfr'] = 'AMD'
+        m = re.search(r'(ryzen\s?\d)', txt)
+        if m: s['cpuModel'] = m.group(0).capitalize()
+    elif 'm1' in txt or 'm2' in txt or 'm3' in txt:
+        s['cpuMfr'] = 'Apple'
+        m = re.search(r'(m[123]\s?(pro|max|ultra)?)', txt)
+        if m: s['cpuModel'] = m.group(1).upper()
+
+    # GPU
+    m = re.search(r'(rtx|gtx|rx)\s?(\d{3,4})', txt)
+    if m:
+        s['gpuMfr'] = 'NVIDIA' if m.group(1) != 'rx' else 'AMD'
+        s['gpuModel'] = f"{m.group(1).upper()} {m.group(2)}"
+
+    return s
+
+def scrape():
     session = requests.Session()
     session.headers.update(HEADERS)
-    
-    all_results = []
-    seen_links = set() # Duplikátumok kiszűrésére
+    all_items = []
+    seen_links = set()
 
     for page in range(MAX_PAGES):
         offset = page * 100
-        # Az első oldalnál nem feltétlen kell az offset, de nem rontja el
-        current_url = f"{BASE_URL}?offset={offset}"
-        
-        print(f"[{page + 1}/{MAX_PAGES}] Oldal lekérése: {current_url}...")
-        
+        url = f"{BASE_URL}?offset={offset}"
+        print(f"Oldal {page+1} letöltése...")
+
         try:
-            response = session.get(current_url, timeout=15)
-            if response.status_code != 200:
-                print(f"Hiba az oldalnál: {response.status_code}")
-                break
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
+            resp = session.get(url, timeout=10)
+            soup = BeautifulSoup(resp.text, 'html.parser')
             ads = soup.select('li.media')
-            
-            if not ads:
-                print("Nincs több hirdetés ezen az oldalon.")
-                break
 
             for ad in ads:
                 title_el = ad.select_one('.uad-col-title a')
                 if not title_el: continue
-                
-                link = title_el['href']
-                if not link.startswith('http'):
-                    link = 'https://hardverapro.hu' + link
-                
-                # Ha már láttuk ezt a hirdetést (pl. kiemelt hirdetés több oldalon is ott van)
-                if link in seen_links:
-                    continue
+
+                link = 'https://hardverapro.hu' + title_el['href'] if not title_el['href'].startswith('http') else title_el['href']
+                if link in seen_links: continue
                 seen_links.add(link)
 
                 title = title_el.get_text(strip=True)
-                price_text = ad.select_one('.uad-price').get_text(strip=True) if ad.select_one('.uad-price') else "0 Ft"
-                seller = ad.select_one('.uad-user-text').get_text(strip=True) if ad.select_one('.uad-user-text') else "Ismeretlen"
-                city = ad.select_one('.uad-cities').get_text(strip=True) if ad.select_one('.uad-cities') else ""
+                desc = title_el.get('title', '')
+                
+                # Kép kinyerése
+                img_el = ad.select_one('.uad-image img')
+                image = ""
+                if img_el:
+                    image = img_el.get('data-src') or img_el.get('src') or ""
+                    if image and not image.startswith('http'):
+                        image = 'https://hardverapro.hu' + image
 
-                all_results.append({
+                # Ár számként
+                price_el = ad.select_one('.uad-price')
+                price_text = price_el.get_text(strip=True) if price_el else "0 Ft"
+                price_val = int(re.sub(r'\D', '', price_text)) if re.sub(r'\D', '', price_text) else 0
+
+                # Specifikációk
+                specs = extract_specs(title, desc)
+
+                # A weboldaladnak szükséges JSON objektum felépítése
+                item = {
                     'title': title,
-                    'link': link,
+                    'price': price_val,
                     'price_text': price_text,
-                    'price_value': parse_price(price_text),
-                    'seller': seller,
-                    'city': city
-                })
-
-            # Fontos: tartsunk szünetet az oldalak között, hogy ne tiltsanak ki!
-            print(f"  -> Eddig összesen {len(all_results)} egyedi hirdetés.")
-            time.sleep(2) 
+                    'link': link,
+                    'image': image,
+                    'seller_name': ad.select_one('.uad-user-text').get_text(strip=True) if ad.select_one('.uad-user-text') else "Ismeretlen",
+                    'city': ad.select_one('.uad-cities').get_text(strip=True) if ad.select_one('.uad-cities') else "",
+                    **specs
+                }
+                all_items.append(item)
 
         except Exception as e:
-            print(f"Hiba történt a lapozás közben: {e}")
+            print(f"Hiba az oldalnál: {e}")
             break
+        
+        time.sleep(1.5)
 
-    # Mentés
-    if all_results:
-        with open('hirdetesek.json', 'w', encoding='utf-8') as f:
-            json.dump(all_results, f, ensure_ascii=False, indent=2)
-        print(f"\nSiker! Összesen {len(all_results)} hirdetés elmentve a hirdetesek.json fájlba.")
+    # Mentés a weboldal által várt néven
+    with open('hirdetesek.json', 'w', encoding='utf-8') as f:
+        json.dump(all_items, f, ensure_ascii=False, indent=2)
+    
+    print(f"\nKész! {len(all_items)} hirdetés mentve a hirdetesek.json-ba.")
 
 if __name__ == "__main__":
-    scrape_everything()
+    scrape()
