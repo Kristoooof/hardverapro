@@ -1,153 +1,35 @@
-import requests
-from bs4 import BeautifulSoup
-import json
-import re
-import time
+name: Hardverapró Scraper
 
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-    'Accept-Language': 'hu-HU,hu;q=0.9,en;q=0.8',
-}
+on:
+  schedule:
+    # Minden 6 órában fut (UTC szerint)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Kézi indítás is
 
-BASE_URL = 'https://hardverapro.hu/aprok/notebook/pc/index.html'
-MAX_PAGES = 5 
+permissions:
+  contents: write
 
-def extract_specs(title, desc):
-    txt = (title + ' ' + desc).lower()
-    s = {
-        'brand': 'Egyéb',
-        'screenSize': None,
-        'resolution': 'HD',
-        'ramSize': None,
-        'ramType': 'DDR4', # Alapértelmezett, ha nem találja
-        'ssdSize': None,
-        'cpuMfr': 'Ismeretlen',
-        'cpuModel': '',
-        'gpuMfr': 'Integrált',
-        'gpuModel': ''
-    }
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-    # --- MÁRKA ---
-    brands = ['lenovo', 'dell', 'hp', 'asus', 'acer', 'apple', 'msi', 'toshiba', 'fujitsu', 'huawei', 'xiaomi', 'microsoft']
-    for b in brands:
-        if b in txt:
-            s['brand'] = b.capitalize() if b != 'hp' else 'HP'
-            break
+      - name: Python setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    # --- RAM MÉRET ÉS TÍPUS ---
-    # Méret (GB)
-    ram_size_match = re.search(r'(\d+)\s*gb', txt)
-    if ram_size_match:
-        s['ramSize'] = int(ram_size_match.group(1))
-    
-    # Típus (DDR1-5)
-    ram_type_match = re.search(r'ddr\s*([1-5])', txt)
-    if ram_type_match:
-        s['ramType'] = f"DDR{ram_type_match.group(1)}"
-    elif 'lpddr5' in txt: s['ramType'] = 'LPDDR5'
-    elif 'lpddr4' in txt: s['ramType'] = 'LPDDR4'
+      - name: Függőségek
+        run: pip install requests beautifulsoup4
 
-    # --- CPU (Intel Ultra & i-széria) ---
-    if 'ultra' in txt:
-        s['cpuMfr'] = 'Intel'
-        m = re.search(r'ultra\s*([579])', txt)
-        if m: s['cpuModel'] = f"Core Ultra {m.group(1)}"
-        else: s['cpuModel'] = "Core Ultra"
-    elif 'intel' in txt or re.search(r'i[3579]-', txt):
-        s['cpuMfr'] = 'Intel'
-        m = re.search(r'(i[3579]-?\d{4,5}[a-z]*)', txt)
-        if m: s['cpuModel'] = m.group(1).upper()
-    elif 'ryzen' in txt or 'amd' in txt:
-        s['cpuMfr'] = 'AMD'
-        m = re.search(r'ryzen\s*([3579])', txt)
-        if m: s['cpuModel'] = f"Ryzen {m.group(1)}"
-    elif 'm1' in txt or 'm2' in txt or 'm3' in txt:
-        s['cpuMfr'] = 'Apple'
-        m = re.search(r'(m[123]\s*(pro|max|ultra)?)', txt)
-        if m: s['cpuModel'] = m.group(1).upper()
+      - name: Scrapelés
+        run: python scraper.py
 
-    # --- TÁRHELY (SSD/TB/GB) ---
-    m = re.search(r'(\d+)\s*(gb|tb)\s*(ssd|nvme|m\.2)', txt)
-    if m:
-        size = int(m.group(1))
-        unit = m.group(2)
-        s['ssdSize'] = size * 1024 if unit == 'tb' else size
-
-    # --- KIJELZŐ ---
-    m = re.search(r'(\d{2}(?:\.\d+)?)\s*(?:"|col)', txt)
-    if m: s['screenSize'] = float(m.group(1))
-
-    # --- GPU ---
-    m = re.search(r'(rtx|gtx|rx)\s*(\d{3,4})', txt)
-    if m:
-        s['gpuMfr'] = 'NVIDIA' if m.group(1) != 'rx' else 'AMD'
-        s['gpuModel'] = f"{m.group(1).upper()} {m.group(2)}"
-
-    return s
-
-def scrape():
-    session = requests.Session()
-    session.headers.update(HEADERS)
-    all_items = []
-    seen_links = set()
-
-    for page in range(MAX_PAGES):
-        offset = page * 100
-        url = f"{BASE_URL}?offset={offset}"
-        print(f"Oldal {page+1}... ", end="", flush=True)
-
-        try:
-            resp = session.get(url, timeout=10)
-            soup = BeautifulSoup(resp.text, 'html.parser')
-            ads = soup.select('li.media')
-            
-            if not ads: break
-
-            count = 0
-            for ad in ads:
-                title_el = ad.select_one('.uad-col-title a')
-                if not title_el: continue
-
-                link = title_el['href']
-                if not link.startswith('http'): link = 'https://hardverapro.hu' + link
-                if link in seen_links: continue
-                seen_links.add(link)
-
-                title = title_el.get_text(strip=True)
-                desc = title_el.get('title', '')
-                
-                # Kép és Ár
-                img_el = ad.select_one('.uad-image img')
-                image = img_el.get('data-src') or img_el.get('src') or ""
-                if image and not image.startswith('http'): image = 'https://hardverapro.hu' + image
-
-                price_text = ad.select_one('.uad-price').get_text(strip=True) if ad.select_one('.uad-price') else "0 Ft"
-                price_val = int(re.sub(r'\D', '', price_text)) if re.sub(r'\D', '', price_text) else 0
-
-                specs = extract_specs(title, desc)
-
-                all_items.append({
-                    'title': title,
-                    'price': price_val,
-                    'price_text': price_text,
-                    'link': link,
-                    'image': image,
-                    'seller_name': ad.select_one('.uad-user-text').get_text(strip=True) if ad.select_one('.uad-user-text') else "Ismeretlen",
-                    'city': ad.select_one('.uad-cities').get_text(strip=True) if ad.select_one('.uad-cities') else "",
-                    **specs
-                })
-                count += 1
-            print(f"OK ({count} új)")
-
-        except Exception as e:
-            print(f"Hiba: {e}")
-            break
-        
-        time.sleep(1.5)
-
-    with open('hirdetesek.json', 'w', encoding='utf-8') as f:
-        json.dump(all_items, f, ensure_ascii=False, indent=2)
-    print(f"\nSikeres mentés: {len(all_items)} hirdetés.")
-
-if __name__ == "__main__":
-    scrape()
+      - name: Commit & Push
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add hirdetesek.json
+          git diff --staged --quiet || git commit -m "Auto: hirdetések frissítve"
+          git push
