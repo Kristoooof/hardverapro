@@ -1,593 +1,628 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>LaptopKereső – Hardverapró Szűrő</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --bg:#0c0f14;--bg2:#13161d;--card:#181c24;--card-h:#1e232e;
+  --border:#262c38;--text:#e4e8f0;--muted:#6e7a8f;
+  --accent:#e8943a;--accent-h:#f0a94f;--accent-dim:rgba(232,148,58,.12);
+  --green:#34d27b;--red:#ef5350;--blue:#5ba4f5;
+  --radius:7px;--radius-lg:10px;--sidebar:280px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-tap-highlight-color:transparent}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 80% 60% at 15% 30%,rgba(232,148,58,.04),transparent),
+  radial-gradient(ellipse 60% 50% at 85% 70%,rgba(91,164,245,.03),transparent);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
-<!DOCTYPE html><html lang="en"><head>
-		<meta charset="utf-8">
-		<link rel="icon" type="image/png" sizes="512x512" href="https://z-cdn.chatglm.cn/z-ai/static/logo.svg">
-		<link rel="shortcut icon" href="https://z-cdn.chatglm.cn/z-ai/static/logo.svg">
-		<link rel="apple-touch-icon" sizes="512x512" href="https://z-cdn.chatglm.cn/z-ai/static/logo.svg">
-		<meta name="apple-mobile-web-app-title" content="Z.ai - Free AI Chatbot &amp; Agent powered by GLM-5.1 &amp; GLM-5">
-		
-		<meta name="keywords" content="GLM-4.6, GLM 4.6, GLM-4.6-Air, GLM 4.6 Air, GLM 4.5, GLM4.5, GLM4.6, Deep Research, z ai, z.ai, GLM 4.5 AI, GLM 4.6 AI, GLM AI, Chat Z, zai, Chat AI, GLM, z.ia, Chat Z AI, AI chat, chatbot, z.ai chat, free ai chat, free AI, free ai chat no login, GLM-4.5, GLM-4.5 chat, GLM-4.1V, GLM-4.5V, AI assistant chat, AI PPT, AI presentation, AI presentation maker, AI slides maker, AI slides, slide deck, pitch deck, AI deck generator, free pitch deck generator, AI PPT, AI PPT maker, AI for Google Slides, AI for PowerPoint, AI writer, AI writing assistant, AI code generator, full stack code generation, AI full stack developer, claude code, Roo Code, Cline, Kilo Code, OpenCode, Codex, Cursor, GLM Coding Plan, GLM Coding, AI Coding, code writer ai, magic design, magic design tool, AI inspiration board, visual brainstorming AI, chat with AI, AI对话, AI聊天, 聊天机器人, 免费AI聊天, AI做PPT, AI写作, AI编程, 全栈开发, 灵感画板, AI tool, AI helper, AI for students, AI for marketers, AI for content creation, ChatGPT, chatgpt free, Free ChatGPT, gpt chat, Gemini, Grok, Claude, Poe AI, YouChat, Jasper AI, deepseek, qwen, 豆包, 文心一言, AI搜问答, 写作灵感AI, 代码解释工具, PPT思路生成, 如何用AI做PPT, create pitch deck from brief, AI business plan presentation, marketing report slides, AI academic paper assistant, AI legal contract drafting, write social media calendar, AI email responder,  VS Code AI assistant, AI for Notion, AI for Figma, AI math problem solver from image, AI geoguessr solver, image to code generator, table extractor from image, chart data extractor, document analysis AI, image caption generator, visual Q&amp;A, 看图猜成语, AI拍照解题, 数学题解答, 物理题解答, GeoGuess AI, 图片转表格, 图片读数据, 看图问答, analyze video, summarize video content, generate video transcript, find object in image, what is in this picture, 视频分析, 视频内容摘要, 生成视频字幕, 图片里有什么, 识别图中物体, GLM-4.7, GLM 4.7, GLM4.7, skills, coding plan, GLM-5, GLM-5.0, GLM5, GLM 5, Pony, Pony Alpha">
+header{position:sticky;top:0;z-index:100;background:rgba(12,15,20,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 14px;gap:10px}
+.logo{display:flex;align-items:center;gap:7px;font-weight:700;font-size:16px;white-space:nowrap;letter-spacing:-.3px}
+.logo-box{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),#d06e28);border-radius:6px;display:grid;place-items:center;color:#fff;font-size:13px;flex-shrink:0}
+.logo span{color:var(--accent)}
+.badge{display:flex;align-items:center;gap:4px;padding:2px 9px;border-radius:14px;font-size:10px;font-weight:600;letter-spacing:.3px;flex-shrink:0}
+.badge.live{background:rgba(52,210,123,.12);color:var(--green)}
+.badge.demo{background:var(--accent-dim);color:var(--accent)}
+.badge.err{background:rgba(239,83,80,.12);color:var(--red)}
+.badge .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.badge.live .dot{animation:blink 1.6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hdr-sp{flex:1}
+.btn-refresh{display:flex;align-items:center;gap:5px;padding:6px 12px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(232,148,58,.25);border-radius:var(--radius);font:600 11px/1 'Space Grotesk',sans-serif;cursor:pointer;transition:.2s;white-space:nowrap;flex-shrink:0}
+.btn-refresh:hover{background:rgba(232,148,58,.22);border-color:var(--accent)}
+.btn-refresh.loading i{animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-		<link rel="manifest" href="https://z-cdn.chatglm.cn/z-ai/frontend/static/manifest.json">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-		
-		<meta name="referrer" content="no-referrer">
-		<link rel="search" type="application/opensearchdescription+xml" title="Z.ai - Free AI Chatbot &amp; Agent powered by GLM-5 &amp; GLM-4.7" href="https://z-cdn.chatglm.cn/z-ai/frontend/static/opensearch.xml">
-		<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-Z8QTHYBHP3"></script>
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag() {
-				dataLayer.push(arguments);
-			}
-			gtag('js', new Date());
+.app{display:flex;min-height:calc(100vh - 56px);min-height:calc(100dvh - 56px);position:relative;z-index:1}
 
-			gtag('config', 'G-Z8QTHYBHP3');
-		</script>
+aside{width:var(--sidebar);min-width:var(--sidebar);border-right:1px solid var(--border);background:rgba(19,22,29,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow-y:auto;height:calc(100vh - 56px);height:calc(100dvh - 56px);position:sticky;top:56px;padding:6px 0;-webkit-overflow-scrolling:touch}
+.fs{border-bottom:1px solid var(--border)}
+.fh{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;user-select:none;transition:.15s;-webkit-user-select:none}
+.fh:hover{background:rgba(255,255,255,.02)}
+.fh h3{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.fh h3 i{color:var(--accent);font-size:9px}
+.fh .chev{font-size:9px;color:var(--muted);transition:transform .25s}
+.fs.off .chev{transform:rotate(-90deg)}
+.fs.off .fb{display:none}
+.fb{padding:0 14px 10px}
+.fo{display:flex;align-items:center;gap:7px;padding:5px 0;cursor:pointer;font-size:12.5px;color:var(--text);-webkit-user-select:none}
+.fo input[type=checkbox]{appearance:none;-webkit-appearance:none;width:16px;height:16px;border:1.5px solid var(--border);border-radius:3px;cursor:pointer;position:relative;flex-shrink:0;transition:.15s}
+.fo input:checked{background:var(--accent);border-color:var(--accent)}
+.fo input:checked::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:800}
+.fo .cnt{margin-left:auto;font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.pi{display:flex;gap:5px;align-items:center}
+.pi input{flex:1;padding:7px 8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font:12px/1 'JetBrains Mono',monospace;outline:none;transition:.2s;min-width:0}
+.pi input:focus{border-color:var(--accent)}
+.pi input::placeholder{color:var(--muted);opacity:.4}
+.pi span{color:var(--muted);font-size:10px;flex-shrink:0}
+.mi{width:100%;padding:7px 9px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font:12.5px/1.4 'Space Grotesk',sans-serif;outline:none;transition:.2s}
+.mi:focus{border-color:var(--accent)}
+.mi::placeholder{color:var(--muted);opacity:.4}
+.btn-reset{display:flex;align-items:center;justify-content:center;gap:5px;width:calc(100% - 28px);margin:10px 14px;padding:8px;background:0 0;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);font:600 11px/1 'Space Grotesk',sans-serif;cursor:pointer;transition:.2s}
+.btn-reset:hover{border-color:var(--red);color:var(--red);background:rgba(239,83,80,.08)}
 
-		<script>
-			let metrics = {};
-			const observer = new PerformanceObserver((list) => {
-				const entries = list.getEntries();
+main{flex:1;padding:16px 18px;min-width:0}
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.rc{font-size:12.5px;color:var(--muted)}.rc b{color:var(--text);font-weight:700}
+.rc .updated{font-size:10px;color:var(--muted);opacity:.7;margin-left:4px}
+.tb-sp{flex:1}
+.sel{padding:5px 8px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font:12px/1 'Space Grotesk',sans-serif;cursor:pointer;outline:none}
+.sel option{background:var(--card)}
+.vt{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.vt button{padding:5px 9px;background:0 0;border:none;color:var(--muted);cursor:pointer;transition:.15s;font-size:12px}
+.vt button.on{background:var(--accent-dim);color:var(--accent)}
+.vt button:not(:last-child){border-right:1px solid var(--border)}
 
-				entries.forEach((entry) => {
-					// 根据不同的entry类型处理不同的性能指标
-					switch (entry.entryType) {
-						case 'navigation':
-							{
-								const navEntry = entry;
-								metrics = {
-									...metrics,
-									dns: navEntry.domainLookupEnd - navEntry.domainLookupStart,
-									response: navEntry.responseEnd - navEntry.responseStart,
-									dom_parse: navEntry.domInteractive - navEntry.responseEnd,
-									dom_ready: navEntry.domContentLoadedEventEnd - navEntry.fetchStart,
-									resource: navEntry.domComplete - navEntry.domContentLoadedEventEnd,
-									first_interactive: navEntry.domInteractive - navEntry.fetchStart,
-									first_byte: navEntry.responseStart - navEntry.domainLookupStart,
-									loaded: navEntry.loadEventEnd - navEntry.fetchStart
-								};
-								sessionStorage.setItem('performance', JSON.stringify(metrics));
-								// 发送性能指标到阿里云日志服务
-							}
-							break;
+.list{display:flex;flex-direction:column;gap:8px}
+.list.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.card{display:flex;gap:12px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);transition:.22s;cursor:default;position:relative;overflow:hidden}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:0;transition:.25s}
+.card:hover{border-color:rgba(232,148,58,.28);background:var(--card-h);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.card:hover::after{opacity:1}
+.card-img{width:110px;height:82px;min-width:110px;background:var(--bg);border-radius:var(--radius);display:grid;place-items:center;overflow:hidden;border:1px solid var(--border)}
+.card-img img{width:100%;height:100%;object-fit:cover}
+.card-img .ph{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:24px}
+.card-img .ph small{font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);opacity:.5}
+.card-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.card-title{font-size:13px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.badges{display:flex;flex-wrap:wrap;gap:4px}
+.bdg{display:inline-flex;align-items:center;gap:2px;padding:1px 6px;background:var(--bg);border:1px solid var(--border);border-radius:3px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);white-space:nowrap;line-height:1.6}
+.bdg.hi{background:var(--accent-dim);border-color:rgba(232,148,58,.22);color:var(--accent)}
+.bdg.gr{background:rgba(52,210,123,.08);border-color:rgba(52,210,123,.18);color:var(--green)}
+.bdg.bl{background:rgba(91,164,245,.08);border-color:rgba(91,164,245,.18);color:var(--blue)}
+.card-meta{display:flex;flex-direction:column;gap:4px}
+.card-seller{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.card-seller .name{font-weight:600;color:var(--text);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seller-ratings{display:flex;align-items:center;gap:4px;font-size:10px;font-family:'JetBrains Mono',monospace}
+.seller-ratings .pos{color:var(--green)}
+.seller-ratings .neg{color:var(--red)}
+.seller-ratings .sep{color:var(--border)}
+.card-right{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;min-width:100px;gap:6px}
+.card-price{font-size:16px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.card-price .cur{font-size:11px;font-weight:500;opacity:.8}
+.btn-original{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(91,164,245,.1);border:1px solid rgba(91,164,245,.22);border-radius:4px;color:var(--blue);font:600 10px/1 'Space Grotesk',sans-serif;cursor:pointer;text-decoration:none;transition:.2s;white-space:nowrap}
+.btn-original:hover{background:rgba(91,164,245,.2);border-color:var(--blue);transform:translateX(2px)}
+.btn-original i{font-size:9px}
+.list.grid .card{flex-direction:column}
+.list.grid .card-img{width:100%;height:140px;min-width:unset}
+.list.grid .card-right{flex-direction:row;justify-content:space-between;width:100%;align-items:center}
 
-						case 'paint':
-							if (entry.name === 'first-paint') {
-								metrics = {
-									...metrics,
-									first_paint: entry.startTime
-								};
-								sessionStorage.setItem('performance', JSON.stringify(metrics));
-							}
-							if (entry.name === 'first-contentful-paint') {
-								metrics = {
-									...metrics,
-									first_contentful_paint: entry.startTime
-								};
-								sessionStorage.setItem('performance', JSON.stringify(metrics));
-							}
-							break;
-					}
-				});
-			});
+.err-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;gap:16px;max-width:520px;margin:40px auto}
+.err-panel .err-icon{width:72px;height:72px;border-radius:50%;background:rgba(239,83,80,.1);border:2px solid rgba(239,83,80,.2);display:grid;place-items:center;font-size:28px;color:var(--red)}
+.err-panel h3{font-size:18px;font-weight:700;color:var(--text)}
+.err-panel p{font-size:13px;color:var(--muted);line-height:1.6}
+.err-panel .err-reason{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;font-size:11.5px;color:var(--muted);text-align:left;line-height:1.7;max-width:440px}
+.err-panel .err-reason code{background:var(--bg);padding:2px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:10.5px;display:inline-block;word-break:break-all}
+.err-panel .err-reason strong.step{color:var(--accent);display:block;margin-top:8px;margin-bottom:2px;font-size:12px}
+.err-panel .err-reason strong.step:first-child{margin-top:0}
+.btn-demo{display:flex;align-items:center;gap:7px;padding:10px 22px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font:600 13px/1 'Space Grotesk',sans-serif;cursor:pointer;transition:.2s;margin-top:4px}
+.btn-demo:hover{background:var(--accent-h);transform:translateY(-1px)}
+.btn-demo:active{transform:scale(.97)}
+.empty{text-align:center;padding:50px 20px}
+.empty i{font-size:38px;color:var(--border);margin-bottom:12px;display:block}
+.empty h3{font-size:15px;margin-bottom:5px;color:var(--text)}
+.empty p{font-size:12.5px;color:var(--muted)}
+.loading{text-align:center;padding:50px 20px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
 
-			// 观察的性能指标类型
-			observer.observe({
-				entryTypes: ['navigation', 'paint']
-			});
-		</script>
+.toast{position:fixed;bottom:16px;left:16px;right:16px;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);font-size:12px;box-shadow:0 8px 28px rgba(0,0,0,.45);z-index:1000;transform:translateY(80px);opacity:0;transition:.3s;display:flex;align-items:center;gap:7px;max-width:400px;margin:0 auto}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.t-err{border-color:rgba(239,83,80,.4)}
+.toast.t-ok{border-color:rgba(52,210,123,.4)}
+.toast.t-info{border-color:rgba(91,164,245,.4)}
 
-		<script>
-			function resizeIframe(obj) {
-				obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
-			}
-		</script>
+.sb-tog{display:none;padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;cursor:pointer;align-items:center;gap:5px;flex-shrink:0;font-family:'Space Grotesk',sans-serif;font-weight:600}
+.sb-tog .filter-count{background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:2px}
+.sb-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:98}
+.sb-ov.show{display:block}
+.sb-close{display:none;position:absolute;top:10px;right:12px;width:28px;height:28px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:12px;cursor:pointer;place-items:center;z-index:2}
+aside.open .sb-close{display:grid}
 
-		<script>
-			// On page load or when changing themes, best to add inline in `head` to avoid FOUC
-			const initTheme = () => {
-				const metaThemeColorTag = document.querySelector('meta[name="theme-color"]');
-				// 取用户浏览器设置的主题
-				// const prefersTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+.card{animation:cardIn .3s ease both}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-				const prefersTheme = 'light';
-
-				if (!localStorage?.theme) {
-					localStorage.theme = prefersTheme;
-				}
-
-				if (localStorage.theme === 'system') {
-					document.documentElement.classList.add(prefersTheme);
-					metaThemeColorTag.setAttribute(
-						'content',
-						prefersTheme === 'light' ? '#F4F6F8' : '#141618'
-					);
-				} else if (localStorage.theme === 'light') {
-					document.documentElement.classList.add('light');
-					metaThemeColorTag.setAttribute('content', '#F4F6F8');
-				} else {
-					document.documentElement.classList.add('dark');
-					metaThemeColorTag.setAttribute('content', '#141618');
-				}
-
-				// window.matchMedia('(prefers-color-scheme: dark)').addListener((e) => {
-				// 	if (localStorage.theme === 'system') {
-				// 		if (e.matches) {
-				// 			document.documentElement.classList.add('dark');
-				// 			document.documentElement.classList.remove('light');
-				// 			metaThemeColorTag.setAttribute('content', '#141618');
-				// 		} else {
-				// 			document.documentElement.classList.add('light');
-				// 			document.documentElement.classList.remove('dark');
-				// 			metaThemeColorTag.setAttribute('content', '#F4F6F8');
-				// 		}
-				// 	}
-				// });
-
-				function setSplashImage() {
-					const logo = document.getElementById('logo');
-					const isDarkMode = document.documentElement.classList.contains('dark');
-					const splashContainer = document.getElementById('splash-screen');
-
-					if (isDarkMode) {
-						const darkImage = new Image();
-						darkImage.src = 'https://z-cdn.chatglm.cn/z-ai/static/logo.svg';
-						splashContainer.style.backgroundColor = '#141618';
-
-						darkImage.onload = () => {
-							logo.src = 'https://z-cdn.chatglm.cn/z-ai/static/logo.svg';
-							logo.style.filter = ''; // Ensure no inversion is applied if splash-dark.png exists
-						};
-
-						darkImage.onerror = () => {
-							logo.style.filter = 'invert(1)'; // Invert image if splash-dark.png is missing
-						};
-					} else {
-						splashContainer.style.backgroundColor = '#F4F6F8';
-					}
-				}
-
-				// Runs after classes are assigned
-				window.addEventListener('DOMContentLoaded', setSplashImage, { once: true });
-			};
-			initTheme();
-		</script>
-
-		
-
-		<script>
-			// 炫酷的控制台介绍 - 根据语言显示
-			(function () {
-				// 检测用户语言偏好
-				const userLang = navigator.language || navigator.userLanguage;
-				const isChinese =
-					userLang.startsWith('zh') ||
-					userLang.includes('CN') ||
-					userLang.includes('TW') ||
-					userLang.includes('HK');
-
-				// 共同的 ASCII Logo
-				const logoLines = [
-					'%c███████╗     █████╗ ██╗',
-					'%c╚══███╔╝    ██╔══██╗██║',
-					'%c  ███╔╝     ███████║██║',
-					'%c ███╔╝      ██╔══██║██║',
-					'%c███████╗ ██╗██║  ██║██║',
-					'%c╚══════╝ ╚═╝╚═╝  ╚═╝╚═╝'
-				];
-				const logoColors = [
-					'color: #ff6b6b; font-family: monospace; font-size: 12px;',
-					'color: #4ecdc4; font-family: monospace; font-size: 12px;',
-					'color: #45b7d1; font-family: monospace; font-size: 12px;',
-					'color: #f9ca24; font-family: monospace; font-size: 12px;',
-					'color: #ff9ff3; font-family: monospace; font-size: 12px;',
-					'color: #6c5ce7; font-family: monospace; font-size: 12px;'
-				];
-
-				if (isChinese) {
-					// 中文版本
-					console.log(
-						'%c🚀 欢迎来到 Z.ai 🚀',
-						'color: #00d4ff; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #00d4ff;'
-					);
-					logoLines.forEach((line, index) => console.log(line, logoColors[index]));
-					console.log('');
-					console.log(
-						'%c✨ 基于开源GLM模型的智能AI助手',
-						'color: #a29bfe; font-size: 14px; font-weight: bold;'
-					);
-					console.log('%c🧠 支持文本生成、推理和深度研究', 'color: #fd79a8; font-size: 12px;');
-					console.log('%c🌍 为中英文用户量身定制', 'color: #00b894; font-size: 12px;');
-					console.log('%c💡 免费开源的ChatGPT替代方案', 'color: #fdcb6e; font-size: 12px;');
-					console.log('');
-					console.log('%c---', 'color: #ddd;');
-					console.log(
-						'%c由 ❤️ 和大量 ☕ 驱动',
-						'color: #e84393; font-size: 11px; font-style: italic;'
-					);
-					console.log('');
-					console.log(
-						'%c🚀 加入我们！我们正在招聘优秀人才！',
-						'color: #00b894; font-size: 13px; font-weight: bold;'
-					);
-					console.log(
-						'%c💼 查看职位: https://zhipu-ai.jobs.feishu.cn/s/stmyTm5lxaU',
-						'color: #0984e3; font-size: 12px; text-decoration: underline;'
-					);
-				} else {
-					// 英文版本
-					console.log(
-						'%c🚀 Welcome to Z.ai 🚀',
-						'color: #00d4ff; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #00d4ff;'
-					);
-					logoLines.forEach((line, index) => console.log(line, logoColors[index]));
-					console.log('');
-					console.log(
-						'%c✨ Advanced AI assistant powered by open-source GLM models',
-						'color: #a29bfe; font-size: 14px; font-weight: bold;'
-					);
-					console.log(
-						'%c🧠 Supports text generation, reasoning, and deep research',
-						'color: #fd79a8; font-size: 12px;'
-					);
-					console.log(
-						'%c🌍 Tailored for both English and Chinese users',
-						'color: #00b894; font-size: 12px;'
-					);
-					console.log(
-						'%c💡 Free and open-source ChatGPT alternative',
-						'color: #fdcb6e; font-size: 12px;'
-					);
-					console.log('');
-					console.log('%c---', 'color: #ddd;');
-					console.log(
-						'%cPowered by ❤️ and lots of ☕',
-						'color: #e84393; font-size: 11px; font-style: italic;'
-					);
-					console.log('');
-					console.log(
-						'%c🚀 Join us! We are hiring talented people!',
-						'color: #00b894; font-size: 13px; font-weight: bold;'
-					);
-					console.log(
-						'%c💼 View jobs: https://zhipu-ai.jobs.feishu.cn/s/stmyTm5lxaU',
-						'color: #0984e3; font-size: 12px; text-decoration: underline;'
-					);
-				}
-			})();
-		</script>
-
-		
-		<link rel="modulepreload" href="https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7/_app/immutable/entry/start.BNUalOl4.js">
-		<link rel="modulepreload" href="https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7/_app/immutable/chunks/BQtiYVo6.js">
-		<link rel="modulepreload" href="https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7/_app/immutable/chunks/BUua5J6T.js">
-		<link rel="modulepreload" href="https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7/_app/immutable/chunks/CLLzPxsj.js">
-		<link rel="modulepreload" href="https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7/_app/immutable/entry/app.DPOTsRj8.js">
-		<link rel="modulepreload" href="https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7/_app/immutable/chunks/C1FmrZbK.js">
-		<link rel="modulepreload" href="https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7/_app/immutable/chunks/DE2LdTMs.js">
-	<title>Z.AI Share</title><meta name="description" content="Amazing content sharing from Z.AI"><meta property="og:type" content="website"><meta property="og:site_name" content="Z.AI"><meta property="og:title" content="Z.AI Share"><meta property="og:description" content="Amazing content sharing from Z.AI"><meta property="og:image" content="https://z-cdn.chatglm.cn/z-ai/static/share-logo.png"><meta property="og:image:alt" content="Z.AI Share"><meta property="og:image:width" content="400"><meta property="og:image:height" content="400"><meta property="og:image:type" content="image/png"><meta property="og:url" content="http://chat.z.ai/space/j181935cu711-art"><meta property="article:author" content="Z.AI"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Z.AI Share"><meta name="twitter:description" content="Amazing content sharing from Z.AI"><meta name="twitter:image" content="https://z-cdn.chatglm.cn/z-ai/static/share-logo.png"><meta name="twitter:image:alt" content="Z.AI Share"><meta name="robots" content="index,follow"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="application-name" content="Z.AI"><meta name="theme-color" content="#1976d2"><meta name="msapplication-TileColor" content="#1976d2"><link rel="canonical" href="http://chat.z.ai/space/j181935cu711-art"><script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
-<script>
-(function() {
-  var frontendCallId = Math.random().toString(36).substring(2, 8);
-  console.log('[WeChat-Frontend-' + frontendCallId + '] ===== 开始前端微信JS-SDK初始化 =====');
-  console.log('[WeChat-Frontend-' + frontendCallId + '] 当前页面URL:', window.location.href);
-  console.log('[WeChat-Frontend-' + frontendCallId + '] 当前页面URL (去掉#):', window.location.href.split('#')[0]);
-  console.log('[WeChat-Frontend-' + frontendCallId + '] 签名配置:', {
-    debug: false,
-    appId: 'wxa5796e47c57570b1',
-    timestamp: 1775823371,
-    nonceStr: 'cZ5OeBgUN29YC13j',
-    signature: '79b501d8959caac2bfabd78db225e9728d8af086',
-    jsApiList: ["updateAppMessageShareData","updateTimelineShareData","onMenuShareAppMessage","onMenuShareTimeline"]
-  });
-
-  // 微信 JS-SDK 配置
-  wx.config({
-    debug: false, // 根据环境变量设置debug模式
-    appId: 'wxa5796e47c57570b1', // 公众号的唯一标识
-    timestamp: 1775823371, // 生成签名的时间戳
-    nonceStr: 'cZ5OeBgUN29YC13j', // 生成签名的随机串
-    signature: '79b501d8959caac2bfabd78db225e9728d8af086', // 签名
-    jsApiList: ["updateAppMessageShareData","updateTimelineShareData","onMenuShareAppMessage","onMenuShareTimeline"] // 需要使用的JS接口列表
-  });
-
-  console.log('[WeChat-Frontend-' + frontendCallId + '] wx.config() 调用完成');
-
-  // 微信 JS-SDK 就绪回调
-  wx.ready(function () {
-    console.log('[WeChat-Frontend-' + frontendCallId + '] WeChat JS-SDK ready - 微信JS-SDK就绪!');
-
-    // 分享给朋友的配置
-    console.log('[WeChat-Frontend-' + frontendCallId + '] 开始配置分享给朋友...');
-    wx.updateAppMessageShareData({
-      title: 'Z.AI Share',
-      desc: 'Amazing content sharing from Z.AI',
-      link: 'http://chat.z.ai/space/j181935cu711-art',
-      imgUrl: 'https://z-cdn.chatglm.cn/z-ai/static/share-logo.png',
-      success: function () {
-        console.log('[WeChat-Frontend-' + frontendCallId + '] 分享给朋友成功');
-      },
-      cancel: function () {
-        console.log('[WeChat-Frontend-' + frontendCallId + '] 分享给朋友取消');
-      }
-    });
-
-    // 分享到朋友圈的配置
-    console.log('[WeChat-Frontend-' + frontendCallId + '] 开始配置分享到朋友圈...');
-    wx.updateTimelineShareData({
-      title: 'Z.AI Share',
-      link: 'http://chat.z.ai/space/j181935cu711-art',
-      imgUrl: 'https://z-cdn.chatglm.cn/z-ai/static/share-logo.png',
-      success: function () {
-        console.log('[WeChat-Frontend-' + frontendCallId + '] 分享到朋友圈成功');
-      },
-      cancel: function () {
-        console.log('[WeChat-Frontend-' + frontendCallId + '] 分享到朋友圈取消');
-      }
-    });
-
-    // 兼容旧版本微信客户端
-    console.log('[WeChat-Frontend-' + frontendCallId + '] 开始配置兼容旧版本分享...');
-    wx.onMenuShareAppMessage({
-      title: 'Z.AI Share',
-      desc: 'Amazing content sharing from Z.AI',
-      link: 'http://chat.z.ai/space/j181935cu711-art',
-      imgUrl: 'https://z-cdn.chatglm.cn/z-ai/static/share-logo.png',
-      success: function () {
-        console.log('[WeChat-Frontend-' + frontendCallId + '] 兼容版分享给朋友成功');
-      },
-      cancel: function () {
-        console.log('[WeChat-Frontend-' + frontendCallId + '] 兼容版分享给朋友取消');
-      }
-    });
-
-    wx.onMenuShareTimeline({
-      title: 'Z.AI Share',
-      link: 'http://chat.z.ai/space/j181935cu711-art',
-      imgUrl: 'https://z-cdn.chatglm.cn/z-ai/static/share-logo.png',
-      success: function () {
-        console.log('[WeChat-Frontend-' + frontendCallId + '] 兼容版分享到朋友圈成功');
-      },
-      cancel: function () {
-        console.log('[WeChat-Frontend-' + frontendCallId + '] 兼容版分享到朋友圈取消');
-      }
-    });
-
-    console.log('[WeChat-Frontend-' + frontendCallId + '] 所有分享配置完成');
-  });
-
-  // 微信 JS-SDK 错误回调
-  wx.error(function(res){
-    console.error('[WeChat-Frontend-' + frontendCallId + '] 微信JS-SDK错误:', res);
-    console.error('[WeChat-Frontend-' + frontendCallId + '] 错误详情:', JSON.stringify(res, null, 2));
-    // 可以在这里处理签名验证失败等错误
-  });
-
-  console.log('[WeChat-Frontend-' + frontendCallId + '] ===== 微信JS-SDK初始化完成 =====');
-})();
-</script></head>
-
-	<body data-sveltekit-preload-data="hover">
-		<script>
-			const env = location.hostname === 'chat.z.ai' ? 'prod' : 'pre';
-			!(function (c, b, d, a) {
-				c[a] || (c[a] = {});
-				c[a] = {
-					pid: 'j2c03hoppk@9a8be198b65ba4b',
-					endpoint: 'https://j2c03hoppk-default-cn.rum.aliyuncs.com',
-					// 设置环境信息，参考值：'prod' | 'gray' | 'pre' | 'daily' | 'local'
-					env: env,
-					// 设置路由模式， 参考值：'history' | 'hash'
-					spaMode: 'history',
-					collectors: {
-						// 页面性能指标监听开关，默认开启
-						perf: true,
-						// WebVitals指标监听开关，默认开启
-						webVitals: false,
-						// Ajax监听开关，默认开启
-						api: true,
-						// 静态资源开关，默认开启
-						staticResource: true,
-						// JS错误监听开关，默认开启
-						jsError: true,
-						// 控制台错误监听开关，默认开启
-						consoleError: false,
-						// 用户行为监听开关，默认开启
-						action: true
-					},
-					// 链路追踪配置开关，默认关闭
-					tracing: false,
-					parseViewName(url) {
-						const pathname = new URL(url).pathname;
-						if (!pathname) {
-							return '/';
-						}
-						return pathname.replace(/(.*)\/[a-f0-9-]+$/g, '$1');
-					},
-					evaluateApi(options, response) {
-						const traceId = response?.headers?.get?.('X-Trace-Id') || 'unknown';
-
-						return {
-							name: options.url.replace(/\/[a-f0-9-]{36}/g, '/**'),
-							properties: {
-								traceId
-							}
-						};
-					}
-				};
-				with (b)
-					with (body)
-						with (insertBefore(createElement('script'), firstChild))
-							setAttribute('crossorigin', '', (src = d));
-			})(window, document, 'https://sdk.rum.aliyuncs.com/v2/browser-sdk.js', '__rum');
-		</script>
-		<div style="display: contents">
-			<script>
-				{
-					__sveltekit_platq5 = {
-						base: "",
-						assets: "https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7"
-					};
-
-					const element = document.currentScript.parentElement;
-
-					Promise.all([
-						import("https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7/_app/immutable/entry/start.BNUalOl4.js"),
-						import("https://z-cdn.chatglm.cn/z-ai/frontend/prod-fe-1.1.7/_app/immutable/entry/app.DPOTsRj8.js")
-					]).then(([kit, app]) => {
-						kit.start(app, element);
-					});
-				}
-			</script>
-		</div>
-
-		<div id="splash-screen" style="
-				position: fixed;
-				z-index: 100;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				background-color: #f4f6f8;
-			">
-			<style type="text/css" nonce="">
-				html {
-					overflow-y: scroll !important;
-				}
-			</style>
-
-			<img id="logo" style="
-					position: absolute;
-					width: auto;
-					height: 5rem;
-					top: 50%;
-					left: 50%;
-					transform: translate(-50%, -50%);
-				" src="https://z-cdn.chatglm.cn/z-ai/static/logo.svg">
-
-			<div style="
-					position: absolute;
-					top: 33%;
-					left: 50%;
-
-					width: 24rem;
-					transform: translateX(-50%);
-
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-				">
-				<div style="position: relative; width: 24rem; margin-top: 0.5rem">
-					<div id="progress-background" style="
-							position: absolute;
-							width: 100%;
-							height: 0.75rem;
-
-							border-radius: 9999px;
-							background-color: #f4f6f8;
-						"></div>
-
-					<div id="progress-bar" style="
-							position: absolute;
-							width: 0%;
-							height: 0.75rem;
-							border-radius: 9999px;
-							background-color: #fff;
-						" class="bg-white"></div>
-				</div>
-			</div>
-		</div>
-
-		<script>
-			var token = localStorage.getItem('token');
-			var base = window.WEBUI_BASE_URL || '';
-			var lang = localStorage.locale ?? (navigator.language.includes('zh') ? 'zh-CN' : 'en-US');
-			var config = {
-				credentials: 'include',
-				headers: {
-					Accept: 'application/json',
-					'Content-Type': 'application/json',
-					...(token ? { Authorization: `Bearer ${token}` } : {}),
-					'Accept-Language': lang
-				}
-			};
-
-			window.GLOBAL_FETCHES = {
-				session: fetch(`${base}/api/v1/auths/`, config).then(async (res) => {
-					if (res.status === 401) {
-						location.replace('/auth');
-					}
-					if (!res.ok) throw await res.json();
-					return res.json();
-				}),
-				config: fetch(`${base}/api/config`, config).then(async (res) => {
-					if (!res.ok) throw await res.json();
-					return res.json();
-				}),
-				models: token && fetch(`${base}/api/models`, config),
-				settings:
-					token &&
-					fetch(`${base}/api/v1/users/user/settings`, config).then(async (res) => {
-						if (!res.ok) throw await res.json();
-						return res.json();
-					})
-			};
-		</script>
-		<script async="" src="//o.alicdn.com/frontend-lib/common-lib/jquery.min.js"></script>
-	
-
-
-<style type="text/css" nonce="">
-	html {
-		overflow-y: hidden !important;
-	}
-
-	#splash-screen {
-		background: #f4f6f8;
-	}
-
-	html.dark #splash-screen {
-		background: #141618;
-	}
-
-	#progress-background {
-		display: none;
-	}
-
-	#progress-bar {
-		display: none;
-	}
-
-	html.her #logo {
-		display: none;
-	}
-
-	html.her #progress-background {
-		display: block;
-	}
-
-	html.her #progress-bar {
-		display: block;
-	}
-
-	@media (max-width: 24rem) {
-		html.her #progress-background {
-			display: none;
-		}
-
-		html.her #progress-bar {
-			display: none;
-		}
-	}
-
-	@keyframes pulse {
-		50% {
-			opacity: 0.65;
-		}
-	}
-
-	.animate-pulse-fast {
-		animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-	}
+@media(max-width:1024px){
+  aside{position:fixed;left:-100%;top:56px;z-index:99;background:var(--bg2);transition:left .3s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 24px rgba(0,0,0,.5);width:min(300px,85vw);min-width:unset}
+  aside.open{left:0}
+  .sb-tog{display:flex}
+  .list.grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  header{height:50px;padding:0 10px;gap:7px}
+  .logo{font-size:14px;gap:5px}
+  .logo-box{width:26px;height:26px;font-size:11px;border-radius:5px}
+  .badge{font-size:9px;padding:2px 7px}
+  .btn-refresh{padding:5px 8px;font-size:10px}
+  .btn-refresh span{display:none}
+  main{padding:10px 8px}
+  .toolbar{gap:6px;margin-bottom:10px}
+  .rc{font-size:11px}
+  .sel{font-size:11px;padding:4px 6px}
+  .vt button{padding:4px 7px;font-size:11px}
+  .list{gap:6px}
+  .list.grid{grid-template-columns:1fr}
+  .card{flex-direction:column;gap:8px;padding:10px}
+  .card-img{width:100%;height:120px;min-width:unset}
+  .card-right{flex-direction:row;justify-content:space-between;width:100%;align-items:center;min-width:unset}
+  .card-title{font-size:12.5px;-webkit-line-clamp:2}
+  .card-price{font-size:14px}
+  .badges{gap:3px}
+  .bdg{font-size:9px;padding:1px 5px;line-height:1.5}
+  .card-seller .name{max-width:100px;font-size:10px}
+  .seller-ratings{font-size:9px}
+  .btn-original{font-size:9px;padding:3px 8px}
+  aside{width:min(280px,82vw);top:50px;height:calc(100vh - 50px);height:calc(100dvh - 50px)}
+  .err-panel{padding:30px 16px;margin:20px auto}
+  .err-panel .err-icon{width:56px;height:56px;font-size:22px}
+  .err-panel h3{font-size:16px}
+  .err-panel p{font-size:12px}
+  .err-panel .err-reason{font-size:10.5px;padding:10px 12px}
+  .btn-demo{padding:9px 18px;font-size:12px}
+  .toast{left:12px;right:12px;bottom:12px;font-size:11px}
+}
+@media(max-width:370px){
+  .logo span{display:none}
+  .card-price{font-size:13px}
+  .bdg{font-size:8.5px;padding:1px 4px}
+  .card-seller .name{max-width:80px}
+}
+@supports(padding:env(safe-area-inset-bottom)){
+  .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
+}
 </style>
-</body></html>
+</head>
+<body>
+
+<header>
+  <button class="sb-tog" id="sbTog" onclick="togSB()"><i class="fas fa-sliders-h"></i>Szűrők<span class="filter-count" id="fCount" style="display:none">0</span></button>
+  <div class="logo"><div class="logo-box"><i class="fas fa-laptop"></i></div>Laptop<span>Kereső</span></div>
+  <div id="badge" class="badge demo"><span class="dot"></span><span id="badgeTxt">Betöltés...</span></div>
+  <div class="hdr-sp"></div>
+  <button class="btn-refresh" id="refBtn" onclick="doFetch()"><i class="fas fa-sync-alt"></i><span>Frissítés</span></button>
+</header>
+
+<div class="sb-ov" id="sbOv" onclick="togSB()"></div>
+
+<div class="app">
+  <aside id="sb">
+    <button class="sb-close" onclick="togSB()"><i class="fas fa-times"></i></button>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-tag"></i>Ár</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb"><div class="pi"><input type="number" id="pMin" placeholder="Min" inputmode="numeric" oninput="apply()"><span>–</span><input type="number" id="pMax" placeholder="Max" inputmode="numeric" oninput="apply()"><span>Ft</span></div></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-building"></i>Márka</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fBrand"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-desktop"></i>Kijelző méret</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fScreen"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-expand"></i>Felbontás</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fRes"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-memory"></i>RAM típus</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fRamT"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-grip-lines"></i>RAM méret</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fRamS"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-hdd"></i>SSD méret</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fSSD"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-microchip"></i>CPU gyártó</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fCPU"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-tv"></i>GPU gyártó</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fGPU"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-search"></i>Pontos modell</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb"><input class="mi" id="fModel" placeholder="pl: ThinkPad T14, XPS 15..." oninput="apply()"></div></div>
+    <button class="btn-reset" onclick="resetF()"><i class="fas fa-times"></i>Szűrők törlése</button>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div class="rc" id="rc"><b>0</b> hirdetés</div>
+      <div class="tb-sp"></div>
+      <select class="sel" id="sortSel" onchange="apply()">
+        <option value="pa">Ár növekvő</option>
+        <option value="pd">Ár csökkenő</option>
+        <option value="nm">Név A–Z</option>
+      </select>
+      <div class="vt">
+        <button class="on" onclick="setV('list',this)"><i class="fas fa-list"></i></button>
+        <button onclick="setV('grid',this)"><i class="fas fa-th-large"></i></button>
+      </div>
+    </div>
+    <div class="list" id="listC">
+      <div class="loading"><div class="spinner"></div><p style="color:var(--muted);font-size:13px">Adatok betöltése...</p></div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/*
+  ============================================================
+  !!! FONTOS !!!
+  ============================================================
+  Cseréld ki az alábbi URL-t a saját GitHub raw linkedre!
+
+  Példa:
+  Ha a GitHub felhasználóneved: "janos123"
+  A repód neve: "laptop-data"
+  A branch neve: "main"
+  A fájl neve: "hirdetesek.json"
+
+  Akkor így néz ki:
+  https://raw.githubusercontent.com/janos123/laptop-data/main/hirdetesek.json
+
+  A reponak PUBLIKUSNAK kell lennie!
+  ============================================================
+*/
+const DATA_URL = 'https://raw.githubusercontent.com/FELHASZNALO/REPO/main/hirdetesek.json';
+
+let all = [];
+let filtered = [];
+let view = 'list';
+let activeFilterCount = 0;
+let lastUpdate = null;
+
+const BC = {
+  'Lenovo':'#e2231a','Dell':'#0076ce','HP':'#0096d6','ASUS':'#00549e',
+  'Acer':'#83b81a','MSI':'#ff0000','Apple':'#a2aaad','Huawei':'#cf0a2c',
+  'Microsoft':'#00a4ef','Samsung':'#1428a0','Xiaomi':'#ff6700','Razer':'#00ff00',
+  'Toshiba':'#ff0000','LG':'#a50034','Fujitsu':'#ff0000','Medion':'#005ca9'
+};
+
+/* DEMO ADATOK */
+const DEMO = [
+  {title:"Eladó Lenovo ThinkPad T14 Gen3 – i5-1240P, 16GB DDR5, 512GB SSD, FHD",desc:"Kiváló állapotú üzleti laptop. Intel Core i5-1240P, 16GB DDR5, 512GB NVMe SSD. 14\" FHD IPS. Intel Iris Xe.",price:185000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/thinkpad-t14-gen3",image:"",seller:{name:"Kovacs_Tamas",pos:127,neg:3},brand:"Lenovo",screenSize:14,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-1240P",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"ThinkPad T14 Gen3"},
+  {title:"Dell XPS 15 9520 – i7-12700H, 32GB DDR5, 1TB SSD, RTX 3050 Ti, QHD",desc:"Prémium Dell XPS 15. Intel i7-12700H, 32GB DDR5, 1TB NVMe SSD, RTX 3050 Ti 4GB. QHD OLED.",price:420000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/xps-15-9520",image:"",seller:{name:"LaptopPro_HU",pos:89,neg:1},brand:"Dell",screenSize:15.6,resolution:"QHD",ramType:"DDR5",ramSize:32,ssdSize:1024,cpuMfr:"Intel",cpuModel:"i7-12700H",gpuMfr:"NVIDIA",gpuModel:"RTX 3050 Ti",model:"XPS 15 9520"},
+  {title:"ASUS ROG Strix G15 – i7-12700H, 16GB DDR5, 512GB SSD, RTX 3070, FHD 144Hz",desc:"Gamer laptop. Intel i7-12700H, 16GB DDR5, 512GB NVMe SSD, RTX 3070 8GB. 15.6\" FHD 144Hz IPS.",price:350000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/rog-strix-g15",image:"",seller:{name:"GamerZona",pos:214,neg:8},brand:"ASUS",screenSize:15.6,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-12700H",gpuMfr:"NVIDIA",gpuModel:"RTX 3070",model:"ROG Strix G15"},
+  {title:"Apple MacBook Air M2 2022 – 8GB, 256GB SSD, 13.6\" Liquid Retina",desc:"Apple M2 chip, 8GB egyesített memória, 256GB SSD. 13.6\" Liquid Retina 2560x1664. Éjszakakék.",price:380000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/macbook-air-m2",image:"",seller:{name:"iStore_Peter",pos:56,neg:0},brand:"Apple",screenSize:13.6,resolution:"FHD",ramType:"LPDDR5",ramSize:8,ssdSize:256,cpuMfr:"Apple",cpuModel:"M2",gpuMfr:"Apple",gpuModel:"M2 GPU",model:"MacBook Air M2"},
+  {title:"HP EliteBook 840 G9 – i5-1235U, 16GB DDR5, 256GB SSD, FHD touch",desc:"Üzleti HP. Intel i5-1235U, 16GB DDR5, 256GB NVMe SSD. 14\" FHD IPS touch. Garancia 2025-ig.",price:195000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/elitebook-840-g9",image:"",seller:{name:"CegesGepek",pos:342,neg:12},brand:"HP",screenSize:14,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:256,cpuMfr:"Intel",cpuModel:"i5-1235U",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"EliteBook 840 G9"},
+  {title:"MSI Katana 15 – i5-12450H, 16GB DDR5, 512GB SSD, RTX 4050, FHD 144Hz",desc:"Új gamer laptop. Intel i5-12450H, 16GB DDR5, 512GB NVMe SSD, RTX 4050 6GB. Fullos doboz.",price:275000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/katana-15",image:"",seller:{name:"MSI_Hungary",pos:78,neg:2},brand:"MSI",screenSize:15.6,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-12450H",gpuMfr:"NVIDIA",gpuModel:"RTX 4050",model:"Katana 15"},
+  {title:"Lenovo IdeaPad 5 Pro – Ryzen 5 5600H, 16GB DDR4, 512GB SSD, QHD",desc:"Multimédia laptop. AMD Ryzen 5 5600H, 16GB DDR4, 512GB NVMe SSD. 16\" QHD 120Hz IPS.",price:165000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/ideapad-5-pro",image:"",seller:{name:"Andras_Note",pos:23,neg:1},brand:"Lenovo",screenSize:16,resolution:"QHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"AMD",cpuModel:"Ryzen 5 5600H",gpuMfr:"AMD",gpuModel:"Integrált",model:"IdeaPad 5 Pro"},
+  {title:"Acer Swift 3 – i5-1135G7, 8GB DDR4, 512GB SSD, FHD",desc:"Könnyű notebook. Intel i5-1135G7, 8GB DDR4, 512GB SSD. 14\" FHD IPS. Alig használt.",price:115000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/swift-3",image:"",seller:{name:"NotebookDeals",pos:45,neg:2},brand:"Acer",screenSize:14,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-1135G7",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"Swift 3"},
+  {title:"Dell Latitude 5520 – i5-1145G7, 8GB DDR4, 256GB SSD, FHD",desc:"Céges notebook. Intel i5-1145G7, 8GB DDR4, 256GB NVMe SSD. 15.6\" FHD. Windows 11 Pro.",price:95000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/latitude-5520",image:"",seller:{name:"FirmaNagyker",pos:521,neg:15},brand:"Dell",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"Intel",cpuModel:"i5-1145G7",gpuMfr:"Intel",gpuModel:"UHD Graphics",model:"Latitude 5520"},
+  {title:"ASUS TUF Gaming F15 – i7-11800H, 16GB DDR4, 512GB SSD, RTX 3050, FHD 144Hz",desc:"Katona gamer. Intel i7-11800H, 16GB DDR4, 512GB NVMe SSD, RTX 3050 4GB. Military-grade.",price:220000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/tuf-gaming-f15",image:"",seller:{name:"TUF_Master",pos:67,neg:4},brand:"ASUS",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-11800H",gpuMfr:"NVIDIA",gpuModel:"RTX 3050",model:"TUF Gaming F15"},
+  {title:"Lenovo Legion 5 Pro – Ryzen 7 5800H, 32GB DDR4, 1TB SSD, RTX 3070, QHD 165Hz",desc:"Top gamer. AMD Ryzen 7 5800H, 32GB DDR4, 1TB NVMe SSD, RTX 3070 8GB. 16\" QHD 165Hz.",price:310000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/legion-5-pro",image:"",seller:{name:"Legion_Shop",pos:156,neg:5},brand:"Lenovo",screenSize:16,resolution:"QHD",ramType:"DDR4",ramSize:32,ssdSize:1024,cpuMfr:"AMD",cpuModel:"Ryzen 7 5800H",gpuMfr:"NVIDIA",gpuModel:"RTX 3070",model:"Legion 5 Pro"},
+  {title:"HP Pavilion 15 – i3-1115G1, 8GB DDR4, 256GB SSD, HD",desc:"Olcsó házi laptop. Intel i3-1115G1, 8GB DDR4, 256GB SSD. 15.6\" HD 1366x768.",price:72000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/pavilion-15",image:"",seller:{name:"Olcsogepek99",pos:12,neg:6},brand:"HP",screenSize:15.6,resolution:"HD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"Intel",cpuModel:"i3-1115G1",gpuMfr:"Intel",gpuModel:"UHD Graphics",model:"Pavilion 15"},
+  {title:"Apple MacBook Pro 14 M1 Pro – 16GB, 512GB SSD, Liquid Retina XDR",desc:"Pro Apple laptop. M1 Pro 10-core, 16GB, 512GB SSD. 14\" Liquid Retina XDR 3024x1964.",price:520000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/macbook-pro-14",image:"",seller:{name:"AppleFan_Bp",pos:98,neg:0},brand:"Apple",screenSize:14,resolution:"4K / QHD+",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Apple",cpuModel:"M1 Pro",gpuMfr:"Apple",gpuModel:"M1 Pro GPU",model:"MacBook Pro 14"},
+  {title:"MSI GF63 Thin – i5-10500H, 8GB DDR4, 512GB SSD, GTX 1650, FHD",desc:"Budget gamer. Intel i5-10500H, 8GB DDR4, 512GB NVMe SSD, GTX 1650 4GB. Vékony.",price:125000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/gf63-thin",image:"",seller:{name:"BudgetGamer",pos:34,neg:3},brand:"MSI",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-10500H",gpuMfr:"NVIDIA",gpuModel:"GTX 1650",model:"GF63 Thin"},
+  {title:"Dell Inspiron 15 – Ryzen 3 5300U, 8GB DDR4, 256GB SSD, HD",desc:"Alap notebook. AMD Ryzen 3 5300U, 8GB DDR4, 256GB SSD. 15.6\" HD. Irodai gép.",price:78000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/inspiron-15",image:"",seller:{name:"DellDirect_HU",pos:287,neg:9},brand:"Dell",screenSize:15.6,resolution:"HD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"AMD",cpuModel:"Ryzen 3 5300U",gpuMfr:"AMD",gpuModel:"Integrált",model:"Inspiron 15"},
+  {title:"ASUS ZenBook 14 – i7-1260P, 16GB LPDDR5, 512GB SSD, FHD+ OLED",desc:"Ultraslim. Intel i7-1260P, 16GB LPDDR5, 512GB NVMe SSD. 14\" FHD+ 2880x1800 OLED. Evo.",price:245000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/zenbook-14",image:"",seller:{name:"ZenBook_HU",pos:41,neg:1},brand:"ASUS",screenSize:14,resolution:"QHD",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-1260P",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"ZenBook 14"},
+  {title:"Acer Nitro 5 – i5-12500H, 16GB DDR5, 512GB SSD, RTX 3050, FHD 144Hz",desc:"Gamer notebook. Intel i5-12500H, 16GB DDR5, 512GB NVMe SSD, RTX 3050 4GB. 15.6\" FHD 144Hz.",price:195000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/nitro-5",image:"",seller:{name:"NitroGames",pos:53,neg:2},brand:"Acer",screenSize:15.6,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-12500H",gpuMfr:"NVIDIA",gpuModel:"RTX 3050",model:"Nitro 5"},
+  {title:"Lenovo ThinkPad X1 Carbon Gen10 – i7-1260P, 16GB LPDDR5, 512GB SSD, FHD",desc:"Flagship üzleti. 1.12kg! Intel i7-1260P, 16GB LPDDR5, 512GB NVMe SSD. 14\" FHD IPS. Garancia 2026.",price:395000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/x1-carbon-gen10",image:"",seller:{name:"ThinkPad_Pro",pos:203,neg:4},brand:"Lenovo",screenSize:14,resolution:"FHD",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-1260P",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"ThinkPad X1 Carbon Gen10"},
+  {title:"HP ProBook 450 G9 – i5-1235U, 8GB DDR4, 256GB SSD, FHD",desc:"Irodai HP. Intel i5-1235U, 8GB DDR4, 256GB NVMe SSD. 15.6\" FHD. Num pad, Win 11 Pro.",price:135000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/probook-450-g9",image:"",seller:{name:"HPOffice_HU",pos:167,neg:7},brand:"HP",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"Intel",cpuModel:"i5-1235U",gpuMfr:"Intel",gpuModel:"UHD Graphics",model:"ProBook 450 G9"},
+  {title:"ASUS ROG Zephyrus G14 – Ryzen 9 6900HS, 32GB DDR5, 1TB SSD, RX 6800S, QHD 120Hz",desc:"Prémium gamer. AMD Ryzen 9 6900HS, 32GB DDR5, 1TB NVMe SSD, RX 6800S 8GB. 14\" QHD.",price:480000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/zephyrus-g14",image:"",seller:{name:"ROG_Elite",pos:112,neg:2},brand:"ASUS",screenSize:14,resolution:"QHD",ramType:"DDR5",ramSize:32,ssdSize:1024,cpuMfr:"AMD",cpuModel:"Ryzen 9 6900HS",gpuMfr:"AMD",gpuModel:"RX 6800S",model:"ROG Zephyrus G14"},
+  {title:"Dell XPS 13 9320 – i7-1255U, 16GB LPDDR5, 512GB SSD, 3.5K OLED",desc:"Ultraportable. Intel i7-1255U, 16GB LPDDR5, 512GB SSD. 13.4\" 3456x2160 OLED touch.",price:435000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/xps-13-9320",image:"",seller:{name:"DellPremium",pos:76,neg:0},brand:"Dell",screenSize:13.4,resolution:"4K / QHD+",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-1255U",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"XPS 13 9320"},
+  {title:"Apple MacBook Air M1 2020 – 8GB, 256GB SSD, 13.3\" Retina",desc:"Megbízható M1-es Air. Apple M1, 8GB, 256GB SSD. 13.3\" Retina 2560x1600. Szürke.",price:265000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/macbook-air-m1",image:"",seller:{name:"MacSeller",pos:189,neg:3},brand:"Apple",screenSize:13.3,resolution:"FHD",ramType:"LPDDR4",ramSize:8,ssdSize:256,cpuMfr:"Apple",cpuModel:"M1",gpuMfr:"Apple",gpuModel:"M1 GPU",model:"MacBook Air M1 2020"},
+  {title:"MSI Bravo 15 – Ryzen 5 5600H, 16GB DDR4, 512GB SSD, RX 5500M, FHD 144Hz",desc:"AMD gamer. Ryzen 5 5600H, 16GB DDR4, 512GB NVMe SSD, RX 5500M 4GB. 15.6\" FHD 144Hz.",price:145000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/bravo-15",image:"",seller:{name:"AmdFan_Bp",pos:28,neg:2},brand:"MSI",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"AMD",cpuModel:"Ryzen 5 5600H",gpuMfr:"AMD",gpuModel:"RX 5500M",model:"Bravo 15"},
+  {title:"Huawei MateBook D15 2022 – i5-1155G7, 16GB DDR4, 512GB SSD, FHD",desc:"Stílusos Huawei. Intel i5-1155G7, 16GB DDR4, 512GB SSD. 15.6\" FHD IPS. Fém ház.",price:155000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/matebook-d15",image:"",seller:{name:"HuaweiShop_HU",pos:64,neg:1},brand:"Huawei",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-1155G7",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"MateBook D15 2022"},
+];
+
+/* JSON LEEKÉRÉS */
+async function fetchJSON(){
+  const r = await fetch(DATA_URL, {signal: AbortSignal.timeout(15000)});
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  const data = await r.json();
+  if(!Array.isArray(data)) throw new Error('Nem JSON tomb');
+  return data;
+}
+
+/* FŐ LEEKÉRÉS */
+async function doFetch(){
+  const btn = document.getElementById('refBtn');
+  btn.classList.add('loading');
+  document.getElementById('listC').innerHTML = '<div class="loading"><div class="spinner"></div><p style="color:var(--muted);font-size:13px">Adatok betöltése a GitHubról...</p></div>';
+  setStatus('live','Betöltés...');
+
+  try{
+    const data = await fetchJSON();
+    all = data.map(item => ({
+      title: item.title || '',
+      desc: item.desc || item.description || '',
+      link: item.link || item.url || '',
+      image: item.image || item.img || '',
+      price: item.price || null,
+      seller: {
+        name: (item.seller && item.seller.name) || item.seller_name || 'Ismeretlen',
+        pos: (item.seller && item.seller.pos) || item.seller_pos || 0,
+        neg: (item.seller && item.seller.neg) || item.seller_neg || 0,
+      },
+      brand: item.brand || '',
+      screenSize: item.screenSize || item.screen_size || null,
+      resolution: item.resolution || item.res || '',
+      ramType: item.ramType || item.ram_type || '',
+      ramSize: item.ramSize || item.ram_size || null,
+      ssdSize: item.ssdSize || item.ssd_size || null,
+      cpuMfr: item.cpuMfr || item.cpu_mfr || '',
+      cpuModel: item.cpuModel || item.cpu_model || '',
+      gpuMfr: item.gpuMfr || item.gpu_mfr || '',
+      gpuModel: item.gpuModel || item.gpu_model || '',
+      model: item.model || '',
+    })).filter(it => it.title);
+
+    lastUpdate = new Date();
+    setStatus('live', all.length + ' hirdetés');
+    toast(all.length + ' hirdetés betöltve','ok');
+    buildFilters();
+    apply();
+
+  }catch(e){
+    btn.classList.remove('loading');
+    showErrPanel(e.message);
+  }
+
+  btn.classList.remove('loading');
+}
+
+/* HIBA PANEL */
+function showErrPanel(errMsg){
+  setStatus('err','Sikertelen');
+  const c = document.getElementById('listC');
+  const isPlaceholder = DATA_URL.includes('FELHASZNALO') || DATA_URL.includes('REPO');
+
+  c.innerHTML = `
+    <div class="err-panel">
+      <div class="err-icon"><i class="fas fa-${isPlaceholder?'cog':'unlink'}"></i></div>
+      <h3>${isPlaceholder ? 'Még nincs beállítva az adatforrás' : 'Nem sikerült betölteni az adatokat'}</h3>
+      <p>${isPlaceholder
+        ? 'A JSON fájl URL-je még az alapértelmezett placeholder érték. Be kell állítani a saját GitHub linkedet.'
+        : 'Hiba: ' + (errMsg||'ismeretlen')
+      }</p>
+      ${isPlaceholder ? `
+      <div class="err-reason">
+        <strong class="step">1. lépés — Hozz létre egy publikus GitHub repót</strong>
+        Bármilyen név megteszi, pl. <code>laptop-data</code>
+
+        <strong class="step">2. lépés — Töltsd fel a hirdetesek.json fájlt</strong>
+        Ezt generálja a Python scraper. Futtasd: <code>python scraper.py</code>
+
+        <strong class="step">3. lépés — Keresd meg a fájl raw linkjét</strong>
+        Nyisd meg a GitHubon a fájlt, kattints a "Raw" gombra.
+        Az URL így fog kinézni:<br>
+        <code>https://raw.githubusercontent.com/FELHASZNALO/REPO/main/hirdetesek.json</code>
+
+        <strong class="step">4. lépés — Írd át az URL-t ebben a HTML fájlban</strong>
+        Nyisd meg ezt a HTML fájlt szövegszerkesztővel (VS Code, Notepad++).
+        Keresd meg ezt a sort (a &lt;script&gt; tag elején):<br>
+        <code>const DATA_URL = 'https://raw.githubusercontent.com/FELHASZNALO/REPO/main/hirdetesek.json';</code><br>
+        Cseréld ki a valós linkre:<br>
+        <code>const DATA_URL = 'https://raw.githubusercontent.com/te_neved/laptop-data/main/hirdetesek.json';</code><br>
+        Mentés, majd frissítsd a böngészőt!
+
+        <strong class="step">Automatizálás (opcionális)</strong>
+        A mellékelt <code>.github/workflows/scrape.yml</code> fájllal a GitHub Actions
+        automatikusan frissíti a JSON-t 6 óránként.
+      </div>` : `
+      <div class="err-reason">
+        Ellenőrizd hogy:<br>
+        - A repo <strong>publikus</strong>-e<br>
+        - A fájl létezik-e a repo-ban<br>
+        - Az URL pontos-e<br><br>
+        Jelenleg beállított URL:<br>
+        <code>${DATA_URL}</code><br><br>
+        Nyers URL formátum:<br>
+        <code>https://raw.githubusercontent.com/FELHASZNALO/REPO/BRANCH/fajl.json</code>
+      </div>`}
+      <button class="btn-demo" onclick="loadDemoMode()"><i class="fas fa-play"></i>Demo mód betöltése (${DEMO.length} minta)</button>
+    </div>
+  `;
+}
+
+/* DEMO */
+function loadDemoMode(){
+  setStatus('demo','Demo mód');
+  loadDemo();
+  toast('Demo mód – ' + DEMO.length + ' minta hirdetés','info');
+}
+function loadDemo(){
+  all = JSON.parse(JSON.stringify(DEMO));
+  lastUpdate = null;
+  buildFilters();
+  apply();
+}
+
+/* SZŰRŐK */
+function counts(arr, key){
+  const m={};
+  arr.forEach(x=>{ const v=x[key]; if(v) m[v]=(m[v]||0)+1; });
+  return m;
+}
+function renderChecks(containerId, key, order){
+  const c = counts(all, key);
+  const el = document.getElementById(containerId);
+  const entries = Object.entries(c).sort((a,b)=>{
+    if(order){ const ia=order.indexOf(a[0]),ib=order.indexOf(b[0]); if(ia!==-1&&ib!==-1) return ia-ib; if(ia!==-1) return -1; if(ib!==-1) return 1; }
+    return -a[1]+b[1];
+  });
+  el.innerHTML = entries.map(([v,n])=>`
+    <label class="fo"><input type="checkbox" value="${v}" onchange="apply()"> ${v} <span class="cnt">${n}</span></label>
+  `).join('');
+}
+function buildFilters(){
+  renderChecks('fBrand','brand',['Lenovo','Dell','HP','ASUS','Acer','MSI','Apple','Huawei','Xiaomi','Microsoft','Razer','Toshiba','LG','Fujitsu','Medion','Samsung']);
+  renderChecks('fScreen','screenSize',[13.3,13.4,13.6,14,15.6,16,17.3]);
+  renderChecks('fRes','resolution',['4K / QHD+','QHD','FHD','HD+','HD']);
+  renderChecks('fRamT','ramType',['DDR3','DDR4','DDR5','LPDDR4','LPDDR5']);
+  renderChecks('fRamS','ramSize',[4,8,16,32,64]);
+  renderChecks('fSSD','ssdSize',[128,256,512,1024,2048]);
+  renderChecks('fCPU','cpuMfr',['Intel','AMD','Apple']);
+  renderChecks('fGPU','gpuMfr',['NVIDIA','AMD','Intel']);
+}
+
+/* SZŰRÉS */
+function getChecked(id){
+  return [...document.querySelectorAll('#'+id+' input:checked')].map(c=>c.value);
+}
+function countActiveFilters(){
+  let c = 0;
+  if(document.getElementById('pMin').value) c++;
+  if(document.getElementById('pMax').value) c++;
+  ['fBrand','fScreen','fRes','fRamT','fRamS','fSSD','fCPU','fGPU'].forEach(id=>{
+    c += document.querySelectorAll('#'+id+' input:checked').length;
+  });
+  if(document.getElementById('fModel').value.trim()) c++;
+  return c;
+}
+function apply(){
+  const pMin = parseInt(document.getElementById('pMin').value)||0;
+  const pMax = parseInt(document.getElementById('pMax').value)||Infinity;
+  const brands = getChecked('fBrand');
+  const screens = getChecked('fScreen').map(Number);
+  const ress = getChecked('fRes');
+  const ramTs = getChecked('fRamT');
+  const ramSs = getChecked('fRamS').map(Number);
+  const ssds = getChecked('fSSD').map(Number);
+  const cpus = getChecked('fCPU');
+  const gpus = getChecked('fGPU');
+  const modelQ = document.getElementById('fModel').value.trim().toLowerCase();
+
+  filtered = all.filter(it=>{
+    if(it.price!==null&&it.price!==undefined){ if(it.price<pMin||it.price>pMax) return false; }
+    if(brands.length&&!brands.includes(it.brand)) return false;
+    if(screens.length&&!screens.includes(it.screenSize)) return false;
+    if(ress.length&&!ress.includes(it.resolution)) return false;
+    if(ramTs.length&&!ramTs.includes(it.ramType)) return false;
+    if(ramSs.length&&!ramSs.includes(it.ramSize)) return false;
+    if(ssds.length&&!ssds.includes(it.ssdSize)) return false;
+    if(cpus.length&&!cpus.includes(it.cpuMfr)) return false;
+    if(gpus.length&&!gpus.includes(it.gpuMfr)) return false;
+    if(modelQ){
+      const h = ((it.model||'')+' '+it.title+' '+it.desc).toLowerCase();
+      if(!h.includes(modelQ)) return false;
+    }
+    return true;
+  });
+
+  const sort = document.getElementById('sortSel').value;
+  filtered.sort((a,b)=>{
+    if(sort==='pa') return ((a.price||Infinity)-(b.price||Infinity));
+    if(sort==='pd') return ((b.price||0)-(a.price||0));
+    return a.title.localeCompare(b.title,'hu');
+  });
+
+  activeFilterCount = countActiveFilters();
+  const fc = document.getElementById('fCount');
+  fc.textContent = activeFilterCount;
+  fc.style.display = activeFilterCount ? 'inline' : 'none';
+
+  render();
+}
+
+/* MEGJELENÍTÉS */
+function fmtPrice(p){
+  if(!p&&p!==0) return 'Nincs ár';
+  return p.toLocaleString('hu-HU')+' <span class="cur">Ft</span>';
+}
+function fmtSSD(v){
+  if(!v) return null;
+  return v>=1024?(v/1024)+' TB':v+' GB';
+}
+function trustColor(pos, neg){
+  if(!pos&&!neg) return 'var(--muted)';
+  const ratio = neg > 0 ? pos/neg : pos;
+  if(ratio >= 20) return 'var(--green)';
+  if(ratio >= 5) return '#8bc34a';
+  if(ratio >= 2) return 'var(--accent)';
+  return 'var(--red)';
+}
+function fmtTime(d){
+  if(!d) return '';
+  const diff = Math.floor((Date.now() - d.getTime()) / 60000);
+  if(diff < 1) return 'frissen';
+  if(diff < 60) return diff + ' perce';
+  if(diff < 1440) return Math.floor(diff/60) + ' órája';
+  return Math.floor(diff/1440) + ' napja';
+}
+
+function render(){
+  const c = document.getElementById('listC');
+  const updStr = lastUpdate ? '<span class="updated">(frissítve: '+fmtTime(lastUpdate)+')</span>' : '';
+  document.getElementById('rc').innerHTML = '<b>'+filtered.length+'</b> hirdetés '+updStr;
+
+  if(!filtered.length && all.length){
+    c.innerHTML = '<div class="empty"><i class="fas fa-filter"></i><h3>Nincs találat</h3><p>Próbáld meg lazítani a szűrőket.</p></div>';
+    return;
+  }
+
+  c.className = 'list'+(view==='grid'?' grid':'');
+
+  c.innerHTML = filtered.map((it,i)=>{
+    const bc = BC[it.brand]||'#444';
+    const badges = [];
+    if(it.cpuModel) badges.push('<span class="bdg hi"><i class="fas fa-microchip"></i>'+it.cpuModel+'</span>');
+    if(it.ramSize) badges.push('<span class="bdg"><i class="fas fa-memory"></i>'+it.ramSize+'GB'+(it.ramType?' '+it.ramType:'')+'</span>');
+    if(it.ssdSize) badges.push('<span class="bdg"><i class="fas fa-hdd"></i>'+fmtSSD(it.ssdSize)+' SSD</span>');
+    if(it.gpuModel&&it.gpuModel!=='Integrált') badges.push('<span class="bdg bl"><i class="fas fa-tv"></i>'+it.gpuModel+'</span>');
+    if(it.screenSize) badges.push('<span class="bdg"><i class="fas fa-desktop"></i>'+it.screenSize+'</span>');
+    if(it.resolution) badges.push('<span class="bdg"><i class="fas fa-expand"></i>'+it.resolution+'</span>');
+    if(it.brand) badges.push('<span class="bdg gr"><i class="fas fa-building"></i>'+it.brand+'</span>');
+
+    const imgHtml = it.image
+      ? '<img src="'+it.image+'" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=\\\'ph\\\' style=\\\'color:'+bc+'\\\'><i class=\\\'fas fa-laptop\\\'></i><small>'+(it.brand||'Laptop')+'</small></div>\'">'
+      : '<div class="ph" style="color:'+bc+'"><i class="fas fa-laptop"></i><small>'+(it.brand||'Laptop')+'</small></div>';
+
+    const sn = it.seller?it.seller.name:'';
+    const sp = it.seller?it.seller.pos:0;
+    const sn2 = it.seller?it.seller.neg:0;
+    const tc = trustColor(sp,sn2);
+    const sellerHtml = sn ? '<div class="card-seller"><i class="fas fa-user-circle" style="color:'+tc+';font-size:13px;flex-shrink:0"></i><span class="name" title="'+sn+'">'+sn+'</span>'+((sp||sn2)?'<span class="seller-ratings"><span class="pos">+'+sp+'</span><span class="sep">/</span><span class="neg">-'+sn2+'</span></span>':'')+'</div>' : '';
+
+    const origBtn = it.link ? '<a class="btn-original" href="'+it.link+'" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>Eredeti hirdetés</a>' : '';
+
+    return '<div class="card" style="animation-delay:'+Math.min(i*25,500)+'ms"><div class="card-img">'+imgHtml+'</div><div class="card-body"><div class="card-title">'+it.title+'</div><div class="badges">'+badges.join('')+'</div>'+sellerHtml+'</div><div class="card-right"><div class="card-price">'+fmtPrice(it.price)+'</div>'+origBtn+'</div></div>';
+  }).join('');
+}
+
+/* UI */
+function togF(el){ el.parentElement.classList.toggle('off'); }
+function togSB(){
+  const sb=document.getElementById('sb'), ov=document.getElementById('sbOv');
+  sb.classList.toggle('open');
+  ov.classList.toggle('show');
+  document.body.style.overflow = sb.classList.contains('open') ? 'hidden' : '';
+}
+function setV(v,btn){
+  view=v;
+  document.querySelectorAll('.vt button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  render();
+}
+function resetF(){
+  document.querySelectorAll('.fb input[type=checkbox]').forEach(c=>c.checked=false);
+  document.getElementById('pMin').value='';
+  document.getElementById('pMax').value='';
+  document.getElementById('fModel').value='';
+  apply();
+}
+function setStatus(type,txt){
+  const b=document.getElementById('badge');
+  b.className='badge '+(type==='live'?'live':type==='err'?'err':'demo');
+  document.getElementById('badgeTxt').textContent=txt;
+}
+let toastTimer;
+function toast(msg,type){
+  const el=document.getElementById('toast');
+  el.className='toast t-'+(type||'info')+' show';
+  el.innerHTML='<i class="fas fa-'+(type==='err'?'exclamation-circle':type==='ok'?'check-circle':'info-circle')+'"></i>'+msg;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),4500);
+}
+
+/* INDÍTÁS */
+doFetch();
+</script>
+</body>
+</html>
