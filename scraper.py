@@ -13,7 +13,7 @@ BASE_URL = 'https://hardverapro.hu/aprok/notebook/pc/index.html'
 MAX_PAGES = 5 
 
 def extract_specs(title, desc):
-    # Szöveg tisztítása
+    # Szöveg tisztítása és vesszők cseréje pontra a számok környezetében
     txt = (title + ' ' + desc).replace('\xa0', ' ').replace('\t', ' ')
     t_lower = txt.lower()
     
@@ -37,22 +37,27 @@ def extract_specs(title, desc):
             s['brand'] = b.capitalize() if b != 'hp' else 'HP'
             break
 
-    # --- CPU FELISMERÉS (AI & PRO támogatással) ---
-    
-    # 1. Intel Core Ultra
+    # --- KIJELZŐ MÉRET (Fejlesztett felismerés) ---
+    # Figyeljük a: 15.6, 15,6, 14", 14col, 17.3-as, 13'3 formátumokat
+    # Első körben keressük a tizedesjegyessel rendelkezőket (pl. 15.6 vagy 15,6)
+    scr_complex = re.search(r'(\d{2}[.,]\d)\s*(?:"|col|''|\'|-as|-es|-os)', t_lower)
+    if scr_complex:
+        val = scr_complex.group(1).replace(',', '.')
+        s['screenSize'] = float(val)
+    else:
+        # Ha nincs tizedes, keressük a sima egész számokat (pl. 14", 16 col)
+        scr_simple = re.search(r'(\d{2})\s*(?:"|col|''|\'|-as|-es|-os)', t_lower)
+        if scr_simple:
+            s['screenSize'] = float(scr_simple.group(1))
+
+    # --- CPU FELISMERÉS ---
     if 'ultra' in t_lower:
         s['cpuMfr'] = 'Intel'
         m = re.search(r'ultra\s*([579])\s*([\w\d]+)', t_lower)
-        if m:
-            s['cpuModel'] = f"Core Ultra {m.group(1)} {m.group(2).upper()}"
-        else:
-            s['cpuModel'] = "Core Ultra"
-
-    # 2. AMD Ryzen (AI és PRO verziók is)
+        if m: s['cpuModel'] = f"Core Ultra {m.group(1)} {m.group(2).upper()}"
+        else: s['cpuModel'] = "Core Ultra"
     elif 'ryzen' in t_lower:
         s['cpuMfr'] = 'AMD'
-        # Keresünk opcionálisan "ai" szót, majd a szint (3,5,7,9), majd opcionálisan "pro" szót, végül a számot
-        # Példa: Ryzen AI 9 HX 370, Ryzen 7 PRO 7840U
         m = re.search(r'ryzen\s*(ai\s*)?([3579])\s*(pro\s*)?([\w\d]+)', t_lower)
         if m:
             parts = ["Ryzen"]
@@ -62,24 +67,18 @@ def extract_specs(title, desc):
             parts.append(m.group(4).upper())
             s['cpuModel'] = " ".join(parts)
         else:
-            # Ha a bonyolult minta nem talál semmit, egy egyszerűbb keresés
             m_simple = re.search(r'ryzen\s*([3579])', t_lower)
             if m_simple: s['cpuModel'] = f"Ryzen {m_simple.group(1)}"
-
-    # 3. Intel Core i (hagyományos és speciális utótagok)
     elif re.search(r'i[3579][\s\-]*\d', t_lower):
         s['cpuMfr'] = 'Intel'
         m = re.search(r'(i[3579])[\s\-]*(\d{4,5}[a-z0-9]*)', t_lower)
-        if m:
-            s['cpuModel'] = f"{m.group(1).upper()}-{m.group(2).upper()}"
-
-    # 4. Apple M-széria
+        if m: s['cpuModel'] = f"{m.group(1).upper()}-{m.group(2).upper()}"
     elif 'm1' in t_lower or 'm2' in t_lower or 'm3' in t_lower:
         s['cpuMfr'] = 'Apple'
         m = re.search(r'(m[123]\s*(pro|max|ultra)?)', t_lower)
         if m: s['cpuModel'] = m.group(1).upper()
 
-    # --- RAM, GPU, TÁRHELY, KIJELZŐ ---
+    # --- RAM, GPU, TÁRHELY ---
     ram_m = re.search(r'(\d+)\s*gb', t_lower)
     if ram_m: s['ramSize'] = int(ram_m.group(1))
     
@@ -96,9 +95,6 @@ def extract_specs(title, desc):
         s['gpuMfr'] = 'NVIDIA' if gpu_m.group(1) != 'rx' else 'AMD'
         s['gpuModel'] = f"{gpu_m.group(1).upper()} {gpu_m.group(2)}"
 
-    scr_m = re.search(r'(\d{2}(?:\.\d+)?)\s*(?:"|col)', t_lower)
-    if scr_m: s['screenSize'] = float(scr_m.group(1))
-
     return s
 
 def scrape():
@@ -110,7 +106,7 @@ def scrape():
     for page in range(MAX_PAGES):
         offset = page * 100
         url = f"{BASE_URL}?offset={offset}"
-        print(f"Oldal {page+1} letöltése...")
+        print(f"[{time.strftime('%H:%M:%S')}] {page+1}. oldal lekérése...")
 
         try:
             resp = session.get(url, timeout=30)
@@ -130,7 +126,6 @@ def scrape():
                 title = title_el.get_text(strip=True)
                 desc = title_el.get('title', '')
                 
-                # Ár és Kép
                 price_text = ad.select_one('.uad-price').get_text(strip=True) if ad.select_one('.uad-price') else "0 Ft"
                 price_val = int(re.sub(r'\D', '', price_text)) if re.sub(r'\D', '', price_text) else 0
                 img_el = ad.select_one('.uad-image img')
@@ -154,13 +149,14 @@ def scrape():
             print(f"Hiba történt: {e}")
             break
         
-        # --- Itt a kért 3 másodperces várakozás oldalanként ---
-        print("Várakozás 3 másodpercig...")
-        time.sleep(3)
+        # Mivel nem megyünk be minden hirdetésbe, a kérésednek megfelelően 30 másodperc szünet jön
+        if page < MAX_PAGES - 1:
+            print(f"Várakozás 30 másodpercig a következő oldal előtt...")
+            time.sleep(30)
 
     with open('hirdetesek.json', 'w', encoding='utf-8') as f:
         json.dump(all_items, f, ensure_ascii=False, indent=2)
-    print(f"Sikeresen mentve {len(all_items)} hirdetés.")
+    print(f"Kész! {len(all_items)} hirdetés mentve.")
 
 if __name__ == "__main__":
     scrape()
