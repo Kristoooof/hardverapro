@@ -13,7 +13,7 @@ USER_AGENTS = [
 ]
 
 BASE_URL = 'https://hardverapro.hu/aprok/notebook/pc/index.html'
-MAX_PAGES = 3 # Most már lehet több, mert a régieket átugorja
+MAX_PAGES = 5 # Most már lehet több, mert a régieket átugorja
 
 def extract_specs(text_to_scan):
     t_lower = text_to_scan.lower().replace('\xa0', ' ').replace('\t', ' ')
@@ -156,7 +156,7 @@ def scrape():
                 seen_links.add(link)
 
                 # Olvasási idő szimulálása
-                wait_time = random.uniform(25, 70)
+                wait_time = random.uniform(25, 40)
                 print(f"  Várakozás: {wait_time:.1f} mp...")
                 time.sleep(wait_time)
                 
