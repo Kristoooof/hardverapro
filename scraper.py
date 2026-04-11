@@ -3,15 +3,25 @@ from bs4 import BeautifulSoup
 import json
 import re
 import time
+import random
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-    'Accept-Language': 'hu-HU,hu;q=0.9,en;q=0.8',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Language': 'hu-HU,hu;q=0.9,en-US;q=0.8,en;q=0.7',
+    'DNT': '1',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Fetch-User': '?1',
 }
 
 BASE_URL = 'https://hardverapro.hu/aprok/notebook/pc/index.html'
 MAX_PAGES = 5 
 
+# [Az extract_specs függvényed változatlanul ide jön]
 def extract_specs(title, desc):
     # Szöveg tisztítása és vesszők cseréje pontra a számok környezetében
     txt = (title + ' ' + desc).replace('\xa0', ' ').replace('\t', ' ')
@@ -97,9 +107,12 @@ def extract_specs(title, desc):
 
     return s
 
+
 def scrape():
     session = requests.Session()
     session.headers.update(HEADERS)
+    session.headers.update({'Referer': 'https://www.google.hu/'})
+    
     all_items = []
     seen_links = set()
 
@@ -110,6 +123,12 @@ def scrape():
 
         try:
             resp = session.get(url, timeout=30)
+            session.headers.update({'Referer': url})
+            
+            if resp.status_code == 403:
+                print("Hiba: 403 Forbidden. Valószínűleg túl gyors voltál, vagy IP tiltás.")
+                break
+                
             soup = BeautifulSoup(resp.text, 'html.parser')
             ads = soup.select('li.media')
             if not ads: break
@@ -149,10 +168,10 @@ def scrape():
             print(f"Hiba történt: {e}")
             break
         
-        # Mivel nem megyünk be minden hirdetésbe, a kérésednek megfelelően 30 másodperc szünet jön
         if page < MAX_PAGES - 1:
-            print(f"Várakozás 30 másodpercig a következő oldal előtt...")
-            time.sleep(30)
+            wait_time = random.uniform(35, 65)
+            print(f"Biztonsági várakozás: {wait_time:.1f} mp...")
+            time.sleep(wait_time)
 
     with open('hirdetesek.json', 'w', encoding='utf-8') as f:
         json.dump(all_items, f, ensure_ascii=False, indent=2)
