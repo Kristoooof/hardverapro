@@ -572,10 +572,8 @@ function render(){
     if(it.resolution) badges.push('<span class="bdg"><i class="fas fa-expand"></i>'+it.resolution+'</span>');
     if(it.brand) badges.push('<span class="bdg gr"><i class="fas fa-building"></i>'+it.brand+'</span>');
 
-    const imgHtml = it.image
-      ? '<img src="'+it.image+'" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=\\\'ph\\\' style=\\\'color:'+bc+'\\\'><i class=\\\'fas fa-laptop\\\'></i><small>'+(it.brand||'Laptop')+'</small></div>\'">'
-      : '<div class="ph" style="color:'+bc+'"><i class="fas fa-laptop"></i><small>'+(it.brand||'Laptop')+'</small></div>';
-
+    const imgHtml = '<div class="ph" style="color:'+bc+'"><i class="fas fa-laptop"></i><small>'+(it.brand||'Laptop')+'</small></div>';
+    
     const sn = it.seller?it.seller.name:'';
     const sp = it.seller?it.seller.pos:0;
     const sn2 = it.seller?it.seller.neg:0;
