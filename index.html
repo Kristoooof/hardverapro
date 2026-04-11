@@ -100,7 +100,7 @@ main{flex:1;padding:16px 18px;min-width:0}
 .bdg.hi{background:var(--accent-dim);border-color:rgba(232,148,58,.22);color:var(--accent)}
 .bdg.gr{background:rgba(52,210,123,.08);border-color:rgba(52,210,123,.18);color:var(--green)}
 .bdg.bl{background:rgba(91,164,245,.08);border-color:rgba(91,164,245,.18);color:var(--blue)}
-.card-meta{display:flex;flex-direction:column;gap:4px}
+.bdg.pk{background:rgba(233,30,99,.08);border-color:rgba(233,30,99,.18);color:#e91e63}
 .card-seller{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
 .card-seller .name{font-weight:600;color:var(--text);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .seller-ratings{display:flex;align-items:center;gap:4px;font-size:10px;font-family:'JetBrains Mono',monospace}
@@ -116,6 +116,14 @@ main{flex:1;padding:16px 18px;min-width:0}
 .list.grid .card{flex-direction:column}
 .list.grid .card-img{width:100%;height:140px;min-width:unset}
 .list.grid .card-right{flex-direction:row;justify-content:space-between;width:100%;align-items:center}
+
+.btn-load-more{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:420px;margin:18px auto 8px;padding:13px 24px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);color:var(--text);font:600 13px/1 'Space Grotesk',sans-serif;cursor:pointer;transition:.25s}
+.btn-load-more:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.btn-load-more:active{transform:scale(.97)}
+.btn-load-more i{font-size:12px}
+.btn-load-more .remaining{color:var(--muted);font-size:11px;font-weight:400;margin-left:4px}
+
+.page-info{text-align:center;padding:4px 0 16px;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
 
 .err-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;gap:16px;max-width:520px;margin:40px auto}
 .err-panel .err-icon{width:72px;height:72px;border-radius:50%;background:rgba(239,83,80,.1);border:2px solid rgba(239,83,80,.2);display:grid;place-items:center;font-size:28px;color:var(--red)}
@@ -147,6 +155,10 @@ main{flex:1;padding:16px 18px;min-width:0}
 .sb-ov.show{display:block}
 .sb-close{display:none;position:absolute;top:10px;right:12px;width:28px;height:28px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:12px;cursor:pointer;place-items:center;z-index:2}
 aside.open .sb-close{display:grid}
+
+#scrollTopBtn{position:fixed;bottom:20px;right:20px;width:46px;height:46px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;display:grid;place-items:center;font-size:17px;box-shadow:0 4px 18px rgba(232,148,58,.35);z-index:200;transition:.25s}
+#scrollTopBtn:hover{background:var(--accent-h);transform:translateY(-3px);box-shadow:0 8px 24px rgba(232,148,58,.45)}
+#scrollTopBtn:active{transform:scale(.9)}
 
 .card{animation:cardIn .3s ease both}
 @keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -189,6 +201,8 @@ aside.open .sb-close{display:grid}
   .err-panel .err-reason{font-size:10.5px;padding:10px 12px}
   .btn-demo{padding:9px 18px;font-size:12px}
   .toast{left:12px;right:12px;bottom:12px;font-size:11px}
+  #scrollTopBtn{width:40px;height:40px;font-size:15px;bottom:16px;right:14px}
+  .btn-load-more{padding:11px 18px;font-size:12px}
 }
 @media(max-width:370px){
   .logo span{display:none}
@@ -197,6 +211,7 @@ aside.open .sb-close{display:grid}
   .card-seller .name{max-width:80px}
 }
 @supports(padding:env(safe-area-inset-bottom)){
+  #scrollTopBtn{bottom:calc(20px + env(safe-area-inset-bottom))}
   .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 }
 </style>
@@ -218,13 +233,16 @@ aside.open .sb-close{display:grid}
     <button class="sb-close" onclick="togSB()"><i class="fas fa-times"></i></button>
     <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-tag"></i>Ár</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb"><div class="pi"><input type="number" id="pMin" placeholder="Min" inputmode="numeric" oninput="apply()"><span>–</span><input type="number" id="pMax" placeholder="Max" inputmode="numeric" oninput="apply()"><span>Ft</span></div></div></div>
     <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-building"></i>Márka</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fBrand"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-microchip"></i>CPU széria</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fCpuSeries"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-microchip"></i>CPU gyártó</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fCPU"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-tv"></i>GPU gyártó</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fGPU"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-tv"></i>GPU modell</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fGPUModel"></div></div>
+    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-tachometer-alt"></i>Képkfrissítés</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fRefresh"></div></div>
     <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-desktop"></i>Kijelző méret</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fScreen"></div></div>
     <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-expand"></i>Felbontás</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fRes"></div></div>
     <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-memory"></i>RAM típus</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fRamT"></div></div>
     <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-grip-lines"></i>RAM méret</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fRamS"></div></div>
     <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-hdd"></i>SSD méret</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fSSD"></div></div>
-    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-microchip"></i>CPU gyártó</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fCPU"></div></div>
-    <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-tv"></i>GPU gyártó</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb" id="fGPU"></div></div>
     <div class="fs"><div class="fh" onclick="togF(this)"><h3><i class="fas fa-search"></i>Pontos modell</h3><i class="fas fa-chevron-down chev"></i></div><div class="fb"><input class="mi" id="fModel" placeholder="pl: ThinkPad T14, XPS 15..." oninput="apply()"></div></div>
     <button class="btn-reset" onclick="resetF()"><i class="fas fa-times"></i>Szűrők törlése</button>
   </aside>
@@ -249,31 +267,17 @@ aside.open .sb-close{display:grid}
   </main>
 </div>
 
+<button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Felülre"><i class="fas fa-chevron-up"></i></button>
+
 <div class="toast" id="toast"></div>
 
 <script>
-/*
-  ============================================================
-  !!! FONTOS !!!
-  ============================================================
-  Cseréld ki az alábbi URL-t a saját GitHub raw linkedre!
-
-  Példa:
-  Ha a GitHub felhasználóneved: "janos123"
-  A repód neve: "laptop-data"
-  A branch neve: "main"
-  A fájl neve: "hirdetesek.json"
-
-  Akkor így néz ki:
-  https://raw.githubusercontent.com/janos123/laptop-data/main/hirdetesek.json
-
-  A reponak PUBLIKUSNAK kell lennie!
-  ============================================================
-*/
 const DATA_URL = 'https://raw.githubusercontent.com/Kristoooof/hardverapro/refs/heads/main/hirdetesek.json';
 
+const PAGE_SIZE = 100;
 let all = [];
 let filtered = [];
+let displayCount = PAGE_SIZE;
 let view = 'list';
 let activeFilterCount = 0;
 let lastUpdate = null;
@@ -285,35 +289,105 @@ const BC = {
   'Toshiba':'#ff0000','LG':'#a50034','Fujitsu':'#ff0000','Medion':'#005ca9'
 };
 
-/* DEMO ADATOK */
+/* GPU szín gyártó alapján */
+function gpuBadgeClass(gpuMfr, gpuModel){
+  if(!gpuMfr) return '';
+  const m = gpuMfr.toLowerCase();
+  if(m==='nvidia') return 'bl';
+  if(m==='amd') return 'pk';
+  return ''; /* Intel / Apple → alap stílus */
+}
+
+function getCpuSeries(cpuModel, cpuMfr){
+  if(!cpuModel) return '';
+  const m = cpuModel.toUpperCase();
+  if(cpuMfr==='Apple'){
+    if(m.includes('M4')) return 'Apple M4';
+    if(m.includes('M3')) return 'Apple M3';
+    if(m.includes('M2')) return 'Apple M2';
+    if(m.includes('M1')) return 'Apple M1';
+    return 'Apple egyéb';
+  }
+  if(m.includes('ULTRA')) return 'Intel Core Ultra';
+  if(cpuMfr==='Intel'){
+    const numMatch=m.match(/(\d{4,})/);
+    if(numMatch){
+      const firstTwo=parseInt(numMatch[1].substring(0,2));
+      if(firstTwo>=14) return 'Intel 14th Gen';
+      if(firstTwo===13) return 'Intel 13th Gen';
+      if(firstTwo===12) return 'Intel 12th Gen';
+      if(firstTwo===11) return 'Intel 11th Gen';
+      if(firstTwo===10) return 'Intel 10th Gen';
+      if(firstTwo===9)  return 'Intel 9th Gen';
+      if(firstTwo===8)  return 'Intel 8th Gen';
+      if(firstTwo===7)  return 'Intel 7th Gen';
+      return 'Intel régebbi';
+    }
+    return 'Intel egyéb';
+  }
+  if(cpuMfr==='AMD'){
+    const numMatch=m.match(/(\d{4,})/);
+    if(numMatch){
+      const d=numMatch[1][0];
+      if(d==='9') return 'AMD Ryzen 9000';
+      if(d==='8') return 'AMD Ryzen 8000';
+      if(d==='7') return 'AMD Ryzen 7000';
+      if(d==='6') return 'AMD Ryzen 6000';
+      if(d==='5') return 'AMD Ryzen 5000';
+      if(d==='4') return 'AMD Ryzen 4000';
+      if(d==='3') return 'AMD Ryzen 3000';
+      return 'AMD egyéb';
+    }
+    return 'AMD egyéb';
+  }
+  return '';
+}
+
+const CPU_SERIES_ORDER = [
+  'Intel Core Ultra',
+  'Intel 14th Gen','Intel 13th Gen','Intel 12th Gen','Intel 11th Gen',
+  'Intel 10th Gen','Intel 9th Gen','Intel 8th Gen','Intel régebbi','Intel egyéb',
+  'AMD Ryzen 9000','AMD Ryzen 8000','AMD Ryzen 7000','AMD Ryzen 6000',
+  'AMD Ryzen 5000','AMD Ryzen 4000','AMD Ryzen 3000','AMD egyéb',
+  'Apple M4','Apple M3','Apple M2','Apple M1','Apple egyéb'
+];
+const REFRESH_ORDER = [60,90,120,144,165,240,360];
+
 const DEMO = [
-  {title:"Eladó Lenovo ThinkPad T14 Gen3 – i5-1240P, 16GB DDR5, 512GB SSD, FHD",desc:"Kiváló állapotú üzleti laptop. Intel Core i5-1240P, 16GB DDR5, 512GB NVMe SSD. 14\" FHD IPS. Intel Iris Xe.",price:185000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/thinkpad-t14-gen3",image:"",seller:{name:"Kovacs_Tamas",pos:127,neg:3},brand:"Lenovo",screenSize:14,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-1240P",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"ThinkPad T14 Gen3"},
-  {title:"Dell XPS 15 9520 – i7-12700H, 32GB DDR5, 1TB SSD, RTX 3050 Ti, QHD",desc:"Prémium Dell XPS 15. Intel i7-12700H, 32GB DDR5, 1TB NVMe SSD, RTX 3050 Ti 4GB. QHD OLED.",price:420000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/xps-15-9520",image:"",seller:{name:"LaptopPro_HU",pos:89,neg:1},brand:"Dell",screenSize:15.6,resolution:"QHD",ramType:"DDR5",ramSize:32,ssdSize:1024,cpuMfr:"Intel",cpuModel:"i7-12700H",gpuMfr:"NVIDIA",gpuModel:"RTX 3050 Ti",model:"XPS 15 9520"},
-  {title:"ASUS ROG Strix G15 – i7-12700H, 16GB DDR5, 512GB SSD, RTX 3070, FHD 144Hz",desc:"Gamer laptop. Intel i7-12700H, 16GB DDR5, 512GB NVMe SSD, RTX 3070 8GB. 15.6\" FHD 144Hz IPS.",price:350000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/rog-strix-g15",image:"",seller:{name:"GamerZona",pos:214,neg:8},brand:"ASUS",screenSize:15.6,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-12700H",gpuMfr:"NVIDIA",gpuModel:"RTX 3070",model:"ROG Strix G15"},
-  {title:"Apple MacBook Air M2 2022 – 8GB, 256GB SSD, 13.6\" Liquid Retina",desc:"Apple M2 chip, 8GB egyesített memória, 256GB SSD. 13.6\" Liquid Retina 2560x1664. Éjszakakék.",price:380000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/macbook-air-m2",image:"",seller:{name:"iStore_Peter",pos:56,neg:0},brand:"Apple",screenSize:13.6,resolution:"FHD",ramType:"LPDDR5",ramSize:8,ssdSize:256,cpuMfr:"Apple",cpuModel:"M2",gpuMfr:"Apple",gpuModel:"M2 GPU",model:"MacBook Air M2"},
-  {title:"HP EliteBook 840 G9 – i5-1235U, 16GB DDR5, 256GB SSD, FHD touch",desc:"Üzleti HP. Intel i5-1235U, 16GB DDR5, 256GB NVMe SSD. 14\" FHD IPS touch. Garancia 2025-ig.",price:195000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/elitebook-840-g9",image:"",seller:{name:"CegesGepek",pos:342,neg:12},brand:"HP",screenSize:14,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:256,cpuMfr:"Intel",cpuModel:"i5-1235U",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"EliteBook 840 G9"},
-  {title:"MSI Katana 15 – i5-12450H, 16GB DDR5, 512GB SSD, RTX 4050, FHD 144Hz",desc:"Új gamer laptop. Intel i5-12450H, 16GB DDR5, 512GB NVMe SSD, RTX 4050 6GB. Fullos doboz.",price:275000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/katana-15",image:"",seller:{name:"MSI_Hungary",pos:78,neg:2},brand:"MSI",screenSize:15.6,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-12450H",gpuMfr:"NVIDIA",gpuModel:"RTX 4050",model:"Katana 15"},
-  {title:"Lenovo IdeaPad 5 Pro – Ryzen 5 5600H, 16GB DDR4, 512GB SSD, QHD",desc:"Multimédia laptop. AMD Ryzen 5 5600H, 16GB DDR4, 512GB NVMe SSD. 16\" QHD 120Hz IPS.",price:165000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/ideapad-5-pro",image:"",seller:{name:"Andras_Note",pos:23,neg:1},brand:"Lenovo",screenSize:16,resolution:"QHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"AMD",cpuModel:"Ryzen 5 5600H",gpuMfr:"AMD",gpuModel:"Integrált",model:"IdeaPad 5 Pro"},
-  {title:"Acer Swift 3 – i5-1135G7, 8GB DDR4, 512GB SSD, FHD",desc:"Könnyű notebook. Intel i5-1135G7, 8GB DDR4, 512GB SSD. 14\" FHD IPS. Alig használt.",price:115000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/swift-3",image:"",seller:{name:"NotebookDeals",pos:45,neg:2},brand:"Acer",screenSize:14,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-1135G7",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"Swift 3"},
-  {title:"Dell Latitude 5520 – i5-1145G7, 8GB DDR4, 256GB SSD, FHD",desc:"Céges notebook. Intel i5-1145G7, 8GB DDR4, 256GB NVMe SSD. 15.6\" FHD. Windows 11 Pro.",price:95000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/latitude-5520",image:"",seller:{name:"FirmaNagyker",pos:521,neg:15},brand:"Dell",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"Intel",cpuModel:"i5-1145G7",gpuMfr:"Intel",gpuModel:"UHD Graphics",model:"Latitude 5520"},
-  {title:"ASUS TUF Gaming F15 – i7-11800H, 16GB DDR4, 512GB SSD, RTX 3050, FHD 144Hz",desc:"Katona gamer. Intel i7-11800H, 16GB DDR4, 512GB NVMe SSD, RTX 3050 4GB. Military-grade.",price:220000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/tuf-gaming-f15",image:"",seller:{name:"TUF_Master",pos:67,neg:4},brand:"ASUS",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-11800H",gpuMfr:"NVIDIA",gpuModel:"RTX 3050",model:"TUF Gaming F15"},
-  {title:"Lenovo Legion 5 Pro – Ryzen 7 5800H, 32GB DDR4, 1TB SSD, RTX 3070, QHD 165Hz",desc:"Top gamer. AMD Ryzen 7 5800H, 32GB DDR4, 1TB NVMe SSD, RTX 3070 8GB. 16\" QHD 165Hz.",price:310000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/legion-5-pro",image:"",seller:{name:"Legion_Shop",pos:156,neg:5},brand:"Lenovo",screenSize:16,resolution:"QHD",ramType:"DDR4",ramSize:32,ssdSize:1024,cpuMfr:"AMD",cpuModel:"Ryzen 7 5800H",gpuMfr:"NVIDIA",gpuModel:"RTX 3070",model:"Legion 5 Pro"},
-  {title:"HP Pavilion 15 – i3-1115G1, 8GB DDR4, 256GB SSD, HD",desc:"Olcsó házi laptop. Intel i3-1115G1, 8GB DDR4, 256GB SSD. 15.6\" HD 1366x768.",price:72000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/pavilion-15",image:"",seller:{name:"Olcsogepek99",pos:12,neg:6},brand:"HP",screenSize:15.6,resolution:"HD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"Intel",cpuModel:"i3-1115G1",gpuMfr:"Intel",gpuModel:"UHD Graphics",model:"Pavilion 15"},
-  {title:"Apple MacBook Pro 14 M1 Pro – 16GB, 512GB SSD, Liquid Retina XDR",desc:"Pro Apple laptop. M1 Pro 10-core, 16GB, 512GB SSD. 14\" Liquid Retina XDR 3024x1964.",price:520000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/macbook-pro-14",image:"",seller:{name:"AppleFan_Bp",pos:98,neg:0},brand:"Apple",screenSize:14,resolution:"4K / QHD+",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Apple",cpuModel:"M1 Pro",gpuMfr:"Apple",gpuModel:"M1 Pro GPU",model:"MacBook Pro 14"},
-  {title:"MSI GF63 Thin – i5-10500H, 8GB DDR4, 512GB SSD, GTX 1650, FHD",desc:"Budget gamer. Intel i5-10500H, 8GB DDR4, 512GB NVMe SSD, GTX 1650 4GB. Vékony.",price:125000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/gf63-thin",image:"",seller:{name:"BudgetGamer",pos:34,neg:3},brand:"MSI",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-10500H",gpuMfr:"NVIDIA",gpuModel:"GTX 1650",model:"GF63 Thin"},
-  {title:"Dell Inspiron 15 – Ryzen 3 5300U, 8GB DDR4, 256GB SSD, HD",desc:"Alap notebook. AMD Ryzen 3 5300U, 8GB DDR4, 256GB SSD. 15.6\" HD. Irodai gép.",price:78000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/inspiron-15",image:"",seller:{name:"DellDirect_HU",pos:287,neg:9},brand:"Dell",screenSize:15.6,resolution:"HD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"AMD",cpuModel:"Ryzen 3 5300U",gpuMfr:"AMD",gpuModel:"Integrált",model:"Inspiron 15"},
-  {title:"ASUS ZenBook 14 – i7-1260P, 16GB LPDDR5, 512GB SSD, FHD+ OLED",desc:"Ultraslim. Intel i7-1260P, 16GB LPDDR5, 512GB NVMe SSD. 14\" FHD+ 2880x1800 OLED. Evo.",price:245000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/zenbook-14",image:"",seller:{name:"ZenBook_HU",pos:41,neg:1},brand:"ASUS",screenSize:14,resolution:"QHD",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-1260P",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"ZenBook 14"},
-  {title:"Acer Nitro 5 – i5-12500H, 16GB DDR5, 512GB SSD, RTX 3050, FHD 144Hz",desc:"Gamer notebook. Intel i5-12500H, 16GB DDR5, 512GB NVMe SSD, RTX 3050 4GB. 15.6\" FHD 144Hz.",price:195000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/nitro-5",image:"",seller:{name:"NitroGames",pos:53,neg:2},brand:"Acer",screenSize:15.6,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-12500H",gpuMfr:"NVIDIA",gpuModel:"RTX 3050",model:"Nitro 5"},
-  {title:"Lenovo ThinkPad X1 Carbon Gen10 – i7-1260P, 16GB LPDDR5, 512GB SSD, FHD",desc:"Flagship üzleti. 1.12kg! Intel i7-1260P, 16GB LPDDR5, 512GB NVMe SSD. 14\" FHD IPS. Garancia 2026.",price:395000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/x1-carbon-gen10",image:"",seller:{name:"ThinkPad_Pro",pos:203,neg:4},brand:"Lenovo",screenSize:14,resolution:"FHD",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-1260P",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"ThinkPad X1 Carbon Gen10"},
-  {title:"HP ProBook 450 G9 – i5-1235U, 8GB DDR4, 256GB SSD, FHD",desc:"Irodai HP. Intel i5-1235U, 8GB DDR4, 256GB NVMe SSD. 15.6\" FHD. Num pad, Win 11 Pro.",price:135000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/probook-450-g9",image:"",seller:{name:"HPOffice_HU",pos:167,neg:7},brand:"HP",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"Intel",cpuModel:"i5-1235U",gpuMfr:"Intel",gpuModel:"UHD Graphics",model:"ProBook 450 G9"},
-  {title:"ASUS ROG Zephyrus G14 – Ryzen 9 6900HS, 32GB DDR5, 1TB SSD, RX 6800S, QHD 120Hz",desc:"Prémium gamer. AMD Ryzen 9 6900HS, 32GB DDR5, 1TB NVMe SSD, RX 6800S 8GB. 14\" QHD.",price:480000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/zephyrus-g14",image:"",seller:{name:"ROG_Elite",pos:112,neg:2},brand:"ASUS",screenSize:14,resolution:"QHD",ramType:"DDR5",ramSize:32,ssdSize:1024,cpuMfr:"AMD",cpuModel:"Ryzen 9 6900HS",gpuMfr:"AMD",gpuModel:"RX 6800S",model:"ROG Zephyrus G14"},
-  {title:"Dell XPS 13 9320 – i7-1255U, 16GB LPDDR5, 512GB SSD, 3.5K OLED",desc:"Ultraportable. Intel i7-1255U, 16GB LPDDR5, 512GB SSD. 13.4\" 3456x2160 OLED touch.",price:435000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/xps-13-9320",image:"",seller:{name:"DellPremium",pos:76,neg:0},brand:"Dell",screenSize:13.4,resolution:"4K / QHD+",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-1255U",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"XPS 13 9320"},
-  {title:"Apple MacBook Air M1 2020 – 8GB, 256GB SSD, 13.3\" Retina",desc:"Megbízható M1-es Air. Apple M1, 8GB, 256GB SSD. 13.3\" Retina 2560x1600. Szürke.",price:265000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/macbook-air-m1",image:"",seller:{name:"MacSeller",pos:189,neg:3},brand:"Apple",screenSize:13.3,resolution:"FHD",ramType:"LPDDR4",ramSize:8,ssdSize:256,cpuMfr:"Apple",cpuModel:"M1",gpuMfr:"Apple",gpuModel:"M1 GPU",model:"MacBook Air M1 2020"},
-  {title:"MSI Bravo 15 – Ryzen 5 5600H, 16GB DDR4, 512GB SSD, RX 5500M, FHD 144Hz",desc:"AMD gamer. Ryzen 5 5600H, 16GB DDR4, 512GB NVMe SSD, RX 5500M 4GB. 15.6\" FHD 144Hz.",price:145000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/bravo-15",image:"",seller:{name:"AmdFan_Bp",pos:28,neg:2},brand:"MSI",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"AMD",cpuModel:"Ryzen 5 5600H",gpuMfr:"AMD",gpuModel:"RX 5500M",model:"Bravo 15"},
-  {title:"Huawei MateBook D15 2022 – i5-1155G7, 16GB DDR4, 512GB SSD, FHD",desc:"Stílusos Huawei. Intel i5-1155G7, 16GB DDR4, 512GB SSD. 15.6\" FHD IPS. Fém ház.",price:155000,link:"https://hardverapro.hu/aprok/notebook/pc/elado/matebook-d15",image:"",seller:{name:"HuaweiShop_HU",pos:64,neg:1},brand:"Huawei",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-1155G7",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"MateBook D15 2022"},
+  {title:"Lenovo ThinkPad T14 Gen3 – i5-1240P, 16GB DDR5, 512GB SSD, FHD",desc:"Kiváló állapotú üzleti laptop.",price:185000,link:"#",image:"",seller:{name:"Kovacs_Tamas",pos:127,neg:3},brand:"Lenovo",screenSize:14,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-1240P",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"ThinkPad T14 Gen3",refreshRate:60},
+  {title:"Dell XPS 15 9520 – i7-12700H, 32GB DDR5, 1TB SSD, RTX 3050 Ti, QHD",desc:"Prémium Dell XPS 15.",price:420000,link:"#",image:"",seller:{name:"LaptopPro_HU",pos:89,neg:1},brand:"Dell",screenSize:15.6,resolution:"QHD",ramType:"DDR5",ramSize:32,ssdSize:1024,cpuMfr:"Intel",cpuModel:"i7-12700H",gpuMfr:"NVIDIA",gpuModel:"RTX 3050 Ti",model:"XPS 15 9520",refreshRate:60},
+  {title:"ASUS ROG Strix G15 – i7-12700H, 16GB DDR5, 512GB SSD, RTX 3070, FHD 144Hz",desc:"Gamer laptop.",price:350000,link:"#",image:"",seller:{name:"GamerZona",pos:214,neg:8},brand:"ASUS",screenSize:15.6,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-12700H",gpuMfr:"NVIDIA",gpuModel:"RTX 3070",model:"ROG Strix G15",refreshRate:144},
+  {title:"Apple MacBook Air M2 2022 – 8GB, 256GB SSD, 13.6\" Liquid Retina",desc:"Apple M2 chip, 8GB, 256GB SSD.",price:380000,link:"#",image:"",seller:{name:"iStore_Peter",pos:56,neg:0},brand:"Apple",screenSize:13.6,resolution:"FHD",ramType:"LPDDR5",ramSize:8,ssdSize:256,cpuMfr:"Apple",cpuModel:"M2",gpuMfr:"Apple",gpuModel:"M2 GPU",model:"MacBook Air M2",refreshRate:60},
+  {title:"HP EliteBook 840 G9 – i5-1235U, 16GB DDR5, 256GB SSD, FHD touch",desc:"Üzleti HP.",price:195000,link:"#",image:"",seller:{name:"CegesGepek",pos:342,neg:12},brand:"HP",screenSize:14,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:256,cpuMfr:"Intel",cpuModel:"i5-1235U",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"EliteBook 840 G9",refreshRate:60},
+  {title:"MSI Katana 15 – i5-12450H, 16GB DDR5, 512GB SSD, RTX 4050, FHD 144Hz",desc:"Új gamer laptop.",price:275000,link:"#",image:"",seller:{name:"MSI_Hungary",pos:78,neg:2},brand:"MSI",screenSize:15.6,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-12450H",gpuMfr:"NVIDIA",gpuModel:"RTX 4050",model:"Katana 15",refreshRate:144},
+  {title:"Lenovo IdeaPad 5 Pro – Ryzen 5 5600H, 16GB DDR4, 512GB SSD, QHD 120Hz",desc:"Multimédia laptop.",price:165000,link:"#",image:"",seller:{name:"Andras_Note",pos:23,neg:1},brand:"Lenovo",screenSize:16,resolution:"QHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"AMD",cpuModel:"Ryzen 5 5600H",gpuMfr:"AMD",gpuModel:"Integrált",model:"IdeaPad 5 Pro",refreshRate:120},
+  {title:"Acer Swift 3 – i5-1135G7, 8GB DDR4, 512GB SSD, FHD",desc:"Könnyű notebook.",price:115000,link:"#",image:"",seller:{name:"NotebookDeals",pos:45,neg:2},brand:"Acer",screenSize:14,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-1135G7",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"Swift 3",refreshRate:60},
+  {title:"Dell Latitude 5520 – i5-1145G7, 8GB DDR4, 256GB SSD, FHD",desc:"Céges notebook.",price:95000,link:"#",image:"",seller:{name:"FirmaNagyker",pos:521,neg:15},brand:"Dell",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"Intel",cpuModel:"i5-1145G7",gpuMfr:"Intel",gpuModel:"UHD Graphics",model:"Latitude 5520",refreshRate:60},
+  {title:"ASUS TUF Gaming F15 – i7-11800H, 16GB DDR4, 512GB SSD, RTX 3050, FHD 144Hz",desc:"Katona gamer.",price:220000,link:"#",image:"",seller:{name:"TUF_Master",pos:67,neg:4},brand:"ASUS",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-11800H",gpuMfr:"NVIDIA",gpuModel:"RTX 3050",model:"TUF Gaming F15",refreshRate:144},
+  {title:"Lenovo Legion 5 Pro – Ryzen 7 5800H, 32GB DDR4, 1TB SSD, RTX 3070, QHD 165Hz",desc:"Top gamer.",price:310000,link:"#",image:"",seller:{name:"Legion_Shop",pos:156,neg:5},brand:"Lenovo",screenSize:16,resolution:"QHD",ramType:"DDR4",ramSize:32,ssdSize:1024,cpuMfr:"AMD",cpuModel:"Ryzen 7 5800H",gpuMfr:"NVIDIA",gpuModel:"RTX 3070",model:"Legion 5 Pro",refreshRate:165},
+  {title:"HP Pavilion 15 – i3-1115G1, 8GB DDR4, 256GB SSD, HD",desc:"Olcsó házi laptop.",price:72000,link:"#",image:"",seller:{name:"Olcsogepek99",pos:12,neg:6},brand:"HP",screenSize:15.6,resolution:"HD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"Intel",cpuModel:"i3-1115G1",gpuMfr:"Intel",gpuModel:"UHD Graphics",model:"Pavilion 15",refreshRate:60},
+  {title:"Apple MacBook Pro 14 M1 Pro – 16GB, 512GB SSD, Liquid Retina XDR",desc:"Pro Apple laptop.",price:520000,link:"#",image:"",seller:{name:"AppleFan_Bp",pos:98,neg:0},brand:"Apple",screenSize:14,resolution:"4K / QHD+",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Apple",cpuModel:"M1 Pro",gpuMfr:"Apple",gpuModel:"M1 Pro GPU",model:"MacBook Pro 14",refreshRate:120},
+  {title:"MSI GF63 Thin – i5-10500H, 8GB DDR4, 512GB SSD, GTX 1650, FHD 60Hz",desc:"Budget gamer.",price:125000,link:"#",image:"",seller:{name:"BudgetGamer",pos:34,neg:3},brand:"MSI",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-10500H",gpuMfr:"NVIDIA",gpuModel:"GTX 1650",model:"GF63 Thin",refreshRate:60},
+  {title:"Dell Inspiron 15 – Ryzen 3 5300U, 8GB DDR4, 256GB SSD, HD",desc:"Alap notebook.",price:78000,link:"#",image:"",seller:{name:"DellDirect_HU",pos:287,neg:9},brand:"Dell",screenSize:15.6,resolution:"HD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"AMD",cpuModel:"Ryzen 3 5300U",gpuMfr:"AMD",gpuModel:"Integrált",model:"Inspiron 15",refreshRate:60},
+  {title:"ASUS ZenBook 14 – i7-1260P, 16GB LPDDR5, 512GB SSD, FHD+ OLED",desc:"Ultraslim.",price:245000,link:"#",image:"",seller:{name:"ZenBook_HU",pos:41,neg:1},brand:"ASUS",screenSize:14,resolution:"QHD",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-1260P",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"ZenBook 14",refreshRate:90},
+  {title:"Acer Nitro 5 – i5-12500H, 16GB DDR5, 512GB SSD, RTX 3050, FHD 144Hz",desc:"Gamer notebook.",price:195000,link:"#",image:"",seller:{name:"NitroGames",pos:53,neg:2},brand:"Acer",screenSize:15.6,resolution:"FHD",ramType:"DDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-12500H",gpuMfr:"NVIDIA",gpuModel:"RTX 3050",model:"Nitro 5",refreshRate:144},
+  {title:"Lenovo ThinkPad X1 Carbon Gen10 – i7-1260P, 16GB LPDDR5, 512GB SSD, FHD",desc:"Flagship üzleti.",price:395000,link:"#",image:"",seller:{name:"ThinkPad_Pro",pos:203,neg:4},brand:"Lenovo",screenSize:14,resolution:"FHD",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-1260P",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"ThinkPad X1 Carbon Gen10",refreshRate:60},
+  {title:"HP ProBook 450 G9 – i5-1235U, 8GB DDR4, 256GB SSD, FHD",desc:"Irodai HP.",price:135000,link:"#",image:"",seller:{name:"HPOffice_HU",pos:167,neg:7},brand:"HP",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:8,ssdSize:256,cpuMfr:"Intel",cpuModel:"i5-1235U",gpuMfr:"Intel",gpuModel:"UHD Graphics",model:"ProBook 450 G9",refreshRate:60},
+  {title:"ASUS ROG Zephyrus G14 – Ryzen 9 6900HS, 32GB DDR5, 1TB SSD, RX 6800S, QHD 120Hz",desc:"Prémium gamer.",price:480000,link:"#",image:"",seller:{name:"ROG_Elite",pos:112,neg:2},brand:"ASUS",screenSize:14,resolution:"QHD",ramType:"DDR5",ramSize:32,ssdSize:1024,cpuMfr:"AMD",cpuModel:"Ryzen 9 6900HS",gpuMfr:"AMD",gpuModel:"RX 6800S",model:"ROG Zephyrus G14",refreshRate:120},
+  {title:"Dell XPS 13 9320 – i7-1255U, 16GB LPDDR5, 512GB SSD, 3.5K OLED",desc:"Ultraportable.",price:435000,link:"#",image:"",seller:{name:"DellPremium",pos:76,neg:0},brand:"Dell",screenSize:13.4,resolution:"4K / QHD+",ramType:"LPDDR5",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i7-1255U",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"XPS 13 9320",refreshRate:60},
+  {title:"Apple MacBook Air M1 2020 – 8GB, 256GB SSD, 13.3\" Retina",desc:"Megbízható M1-es Air.",price:265000,link:"#",image:"",seller:{name:"MacSeller",pos:189,neg:3},brand:"Apple",screenSize:13.3,resolution:"FHD",ramType:"LPDDR4",ramSize:8,ssdSize:256,cpuMfr:"Apple",cpuModel:"M1",gpuMfr:"Apple",gpuModel:"M1 GPU",model:"MacBook Air M1 2020",refreshRate:60},
+  {title:"MSI Bravo 15 – Ryzen 5 5600H, 16GB DDR4, 512GB SSD, RX 5500M, FHD 144Hz",desc:"AMD gamer.",price:145000,link:"#",image:"",seller:{name:"AmdFan_Bp",pos:28,neg:2},brand:"MSI",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"AMD",cpuModel:"Ryzen 5 5600H",gpuMfr:"AMD",gpuModel:"RX 5500M",model:"Bravo 15",refreshRate:144},
+  {title:"Huawei MateBook D15 2022 – i5-1155G7, 16GB DDR4, 512GB SSD, FHD",desc:"Stílusos Huawei.",price:155000,link:"#",image:"",seller:{name:"HuaweiShop_HU",pos:64,neg:1},brand:"Huawei",screenSize:15.6,resolution:"FHD",ramType:"DDR4",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"i5-1155G7",gpuMfr:"Intel",gpuModel:"Iris Xe",model:"MateBook D15 2022",refreshRate:60},
+  {title:"Lenovo Yoga Pro 9i 16IRP9 – Core Ultra 7 155H, 32GB LPDDR5X, 1TB SSD, RTX 4060, 3K 165Hz",desc:"Intel Core Ultra 7 155H.",price:540000,link:"#",image:"",seller:{name:"LenovoPro_HU",pos:134,neg:2},brand:"Lenovo",screenSize:16,resolution:"QHD",ramType:"LPDDR5X",ramSize:32,ssdSize:1024,cpuMfr:"Intel",cpuModel:"Core Ultra 7 155H",gpuMfr:"NVIDIA",gpuModel:"RTX 4060",model:"Yoga Pro 9i 16IRP9",refreshRate:165},
+  {title:"ASUS Zenbook 14 OLED UX3405 – Core Ultra 5 125H, 16GB LPDDR5X, 512GB SSD, 2.8K OLED",desc:"Intel Core Ultra 5 125H.",price:320000,link:"#",image:"",seller:{name:"AsusDirect",pos:88,neg:1},brand:"ASUS",screenSize:14,resolution:"QHD",ramType:"LPDDR5X",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"Core Ultra 5 125H",gpuMfr:"Intel",gpuModel:"Arc Graphics",model:"Zenbook 14 UX3405",refreshRate:60},
+  {title:"Dell XPS 14 9440 – Core Ultra 7 155H, 32GB LPDDR5X, 1TB SSD, Arc Graphics, 3K+ 120Hz",desc:"Intel Core Ultra 7 155H.",price:495000,link:"#",image:"",seller:{name:"Dell_XPS_Shop",pos:102,neg:0},brand:"Dell",screenSize:14,resolution:"4K / QHD+",ramType:"LPDDR5X",ramSize:32,ssdSize:1024,cpuMfr:"Intel",cpuModel:"Core Ultra 7 155H",gpuMfr:"Intel",gpuModel:"Arc Graphics",model:"XPS 14 9440",refreshRate:120},
+  {title:"HP OmniBook Ultra 14 – Core Ultra 5 125U, 16GB LPDDR5X, 512GB SSD, 2.8K OLED",desc:"Intel Core Ultra 5 125U.",price:285000,link:"#",image:"",seller:{name:"HP_Store_HU",pos:76,neg:3},brand:"HP",screenSize:14,resolution:"QHD",ramType:"LPDDR5X",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"Core Ultra 5 125U",gpuMfr:"Intel",gpuModel:"Arc Graphics",model:"OmniBook Ultra 14",refreshRate:60},
+  {title:"Lenovo ThinkPad T14s Gen4 – Core Ultra 5 125U, 32GB LPDDR5X, 512GB SSD, FHD",desc:"Intel Core Ultra 5 125U.",price:365000,link:"#",image:"",seller:{name:"ThinkPad_Bp",pos:215,neg:5},brand:"Lenovo",screenSize:14,resolution:"FHD",ramType:"LPDDR5X",ramSize:32,ssdSize:512,cpuMfr:"Intel",cpuModel:"Core Ultra 5 125U",gpuMfr:"Intel",gpuModel:"Arc Graphics",model:"ThinkPad T14s Gen4",refreshRate:60},
+  {title:"Samsung Galaxy Book4 Ultra – Core Ultra 9 185H, 32GB LPDDR5X, 1TB SSD, RTX 4070, 3K 120Hz",desc:"Intel Core Ultra 9 185H.",price:620000,link:"#",image:"",seller:{name:"Samsung_HU",pos:44,neg:0},brand:"Samsung",screenSize:16,resolution:"4K / QHD+",ramType:"LPDDR5X",ramSize:32,ssdSize:1024,cpuMfr:"Intel",cpuModel:"Core Ultra 9 185H",gpuMfr:"NVIDIA",gpuModel:"RTX 4070",model:"Galaxy Book4 Ultra",refreshRate:120},
+  {title:"Acer Swift Go 14 – Core Ultra 5 125H, 16GB LPDDR5X, 512GB SSD, 2.8K OLED",desc:"Intel Core Ultra 5 125H.",price:235000,link:"#",image:"",seller:{name:"Acer_Hungary",pos:57,neg:2},brand:"Acer",screenSize:14,resolution:"QHD",ramType:"LPDDR5X",ramSize:16,ssdSize:512,cpuMfr:"Intel",cpuModel:"Core Ultra 5 125H",gpuMfr:"Intel",gpuModel:"Arc Graphics",model:"Swift Go 14",refreshRate:60},
+  {title:"ASUS ROG Zephyrus G16 2024 – Core Ultra 9 185H, 32GB LPDDR5X, 1TB SSD, RTX 4070, 2.5K 240Hz",desc:"Intel Core Ultra 9 185H.",price:680000,link:"#",image:"",seller:{name:"ROG_Official",pos:198,neg:3},brand:"ASUS",screenSize:16,resolution:"QHD",ramType:"LPDDR5X",ramSize:32,ssdSize:1024,cpuMfr:"Intel",cpuModel:"Core Ultra 9 185H",gpuMfr:"NVIDIA",gpuModel:"RTX 4070",model:"ROG Zephyrus G16",refreshRate:240},
 ];
 
-/* JSON LEEKÉRÉS */
 async function fetchJSON(){
   const r = await fetch(DATA_URL, {signal: AbortSignal.timeout(15000)});
   if(!r.ok) throw new Error('HTTP ' + r.status);
@@ -322,13 +396,11 @@ async function fetchJSON(){
   return data;
 }
 
-/* FŐ LEEKÉRÉS */
 async function doFetch(){
   const btn = document.getElementById('refBtn');
   btn.classList.add('loading');
   document.getElementById('listC').innerHTML = '<div class="loading"><div class="spinner"></div><p style="color:var(--muted);font-size:13px">Adatok betöltése a GitHubról...</p></div>';
   setStatus('live','Betöltés...');
-
   try{
     const data = await fetchJSON();
     all = data.map(item => ({
@@ -353,77 +425,55 @@ async function doFetch(){
       gpuMfr: item.gpuMfr || item.gpu_mfr || '',
       gpuModel: item.gpuModel || item.gpu_model || '',
       model: item.model || '',
+      refreshRate: item.refreshRate || item.refresh_rate || null,
     })).filter(it => it.title);
-
+    all.forEach(it => { it.cpuSeries = getCpuSeries(it.cpuModel, it.cpuMfr); });
     lastUpdate = new Date();
+    displayCount = PAGE_SIZE;
     setStatus('live', all.length + ' hirdetés');
     toast(all.length + ' hirdetés betöltve','ok');
     buildFilters();
     apply();
-
   }catch(e){
     btn.classList.remove('loading');
     showErrPanel(e.message);
   }
-
   btn.classList.remove('loading');
 }
 
-/* HIBA PANEL */
 function showErrPanel(errMsg){
   setStatus('err','Sikertelen');
   const c = document.getElementById('listC');
   const isPlaceholder = DATA_URL.includes('FELHASZNALO') || DATA_URL.includes('REPO');
-
   c.innerHTML = `
     <div class="err-panel">
       <div class="err-icon"><i class="fas fa-${isPlaceholder?'cog':'unlink'}"></i></div>
       <h3>${isPlaceholder ? 'Még nincs beállítva az adatforrás' : 'Nem sikerült betölteni az adatokat'}</h3>
-      <p>${isPlaceholder
-        ? 'A JSON fájl URL-je még az alapértelmezett placeholder érték. Be kell állítani a saját GitHub linkedet.'
-        : 'Hiba: ' + (errMsg||'ismeretlen')
-      }</p>
+      <p>${isPlaceholder ? 'A JSON fájl URL-je még az alapértelmezett placeholder érték.' : 'Hiba: ' + (errMsg||'ismeretlen')}</p>
       ${isPlaceholder ? `
       <div class="err-reason">
         <strong class="step">1. lépés — Hozz létre egy publikus GitHub repót</strong>
         Bármilyen név megteszi, pl. <code>laptop-data</code>
-
         <strong class="step">2. lépés — Töltsd fel a hirdetesek.json fájlt</strong>
         Ezt generálja a Python scraper. Futtasd: <code>python scraper.py</code>
-
         <strong class="step">3. lépés — Keresd meg a fájl raw linkjét</strong>
         Nyisd meg a GitHubon a fájlt, kattints a "Raw" gombra.
-        Az URL így fog kinézni:<br>
         <code>https://raw.githubusercontent.com/FELHASZNALO/REPO/main/hirdetesek.json</code>
-
         <strong class="step">4. lépés — Írd át az URL-t ebben a HTML fájlban</strong>
-        Nyisd meg ezt a HTML fájlt szövegszerkesztővel (VS Code, Notepad++).
-        Keresd meg ezt a sort (a &lt;script&gt; tag elején):<br>
-        <code>const DATA_URL = 'https://raw.githubusercontent.com/FELHASZNALO/REPO/main/hirdetesek.json';</code><br>
-        Cseréld ki a valós linkre:<br>
-        <code>const DATA_URL = 'https://raw.githubusercontent.com/te_neved/laptop-data/main/hirdetesek.json';</code><br>
-        Mentés, majd frissítsd a böngészőt!
-
-        <strong class="step">Automatizálás (opcionális)</strong>
-        A mellékelt <code>.github/workflows/scrape.yml</code> fájllal a GitHub Actions
-        automatikusan frissíti a JSON-t 6 óránként.
+        <code>const DATA_URL = '...';</code> sort cseréld ki a valós linkre.
       </div>` : `
       <div class="err-reason">
         Ellenőrizd hogy:<br>
         - A repo <strong>publikus</strong>-e<br>
         - A fájl létezik-e a repo-ban<br>
         - Az URL pontos-e<br><br>
-        Jelenleg beállított URL:<br>
-        <code>${DATA_URL}</code><br><br>
-        Nyers URL formátum:<br>
-        <code>https://raw.githubusercontent.com/FELHASZNALO/REPO/BRANCH/fajl.json</code>
+        <code>${DATA_URL}</code>
       </div>`}
       <button class="btn-demo" onclick="loadDemoMode()"><i class="fas fa-play"></i>Demo mód betöltése (${DEMO.length} minta)</button>
     </div>
   `;
 }
 
-/* DEMO */
 function loadDemoMode(){
   setStatus('demo','Demo mód');
   loadDemo();
@@ -431,12 +481,13 @@ function loadDemoMode(){
 }
 function loadDemo(){
   all = JSON.parse(JSON.stringify(DEMO));
+  all.forEach(it => { it.cpuSeries = getCpuSeries(it.cpuModel, it.cpuMfr); });
   lastUpdate = null;
+  displayCount = PAGE_SIZE;
   buildFilters();
   apply();
 }
 
-/* SZŰRŐK */
 function counts(arr, key){
   const m={};
   arr.forEach(x=>{ const v=x[key]; if(v) m[v]=(m[v]||0)+1; });
@@ -453,18 +504,28 @@ function renderChecks(containerId, key, order){
     <label class="fo"><input type="checkbox" value="${v}" onchange="apply()"> ${v} <span class="cnt">${n}</span></label>
   `).join('');
 }
+function renderRefreshChecks(containerId, key, order){
+  const c = counts(all, key);
+  const el = document.getElementById(containerId);
+  const entries = order.filter(v => c[v]).map(v => [v, c[v]]);
+  el.innerHTML = entries.map(([v,n])=>`
+    <label class="fo"><input type="checkbox" value="${v}" onchange="apply()"> ${v}Hz <span class="cnt">${n}</span></label>
+  `).join('');
+}
 function buildFilters(){
+  renderChecks('fCpuSeries','cpuSeries',CPU_SERIES_ORDER);
   renderChecks('fBrand','brand',['Lenovo','Dell','HP','ASUS','Acer','MSI','Apple','Huawei','Xiaomi','Microsoft','Razer','Toshiba','LG','Fujitsu','Medion','Samsung']);
   renderChecks('fScreen','screenSize',[13.3,13.4,13.6,14,15.6,16,17.3]);
   renderChecks('fRes','resolution',['4K / QHD+','QHD','FHD','HD+','HD']);
-  renderChecks('fRamT','ramType',['DDR3','DDR4','DDR5','LPDDR4','LPDDR5']);
+  renderChecks('fRamT','ramType',['DDR3','DDR4','DDR5','LPDDR4','LPDDR5','LPDDR5X']);
   renderChecks('fRamS','ramSize',[4,8,16,32,64]);
   renderChecks('fSSD','ssdSize',[128,256,512,1024,2048]);
   renderChecks('fCPU','cpuMfr',['Intel','AMD','Apple']);
-  renderChecks('fGPU','gpuMfr',['NVIDIA','AMD','Intel']);
+  renderChecks('fGPU','gpuMfr',['NVIDIA','AMD','Intel','Apple']);
+  renderChecks('fGPUModel','gpuModel');
+  renderRefreshChecks('fRefresh','refreshRate',REFRESH_ORDER);
 }
 
-/* SZŰRÉS */
 function getChecked(id){
   return [...document.querySelectorAll('#'+id+' input:checked')].map(c=>c.value);
 }
@@ -472,16 +533,18 @@ function countActiveFilters(){
   let c = 0;
   if(document.getElementById('pMin').value) c++;
   if(document.getElementById('pMax').value) c++;
-  ['fBrand','fScreen','fRes','fRamT','fRamS','fSSD','fCPU','fGPU'].forEach(id=>{
+  ['fBrand','fScreen','fRes','fRamT','fRamS','fSSD','fCPU','fGPU','fGPUModel','fCpuSeries','fRefresh'].forEach(id=>{
     c += document.querySelectorAll('#'+id+' input:checked').length;
   });
   if(document.getElementById('fModel').value.trim()) c++;
   return c;
 }
 function apply(){
+  displayCount = PAGE_SIZE;
   const pMin = parseInt(document.getElementById('pMin').value)||0;
   const pMax = parseInt(document.getElementById('pMax').value)||Infinity;
   const brands = getChecked('fBrand');
+  const cpuSeries = getChecked('fCpuSeries');
   const screens = getChecked('fScreen').map(Number);
   const ress = getChecked('fRes');
   const ramTs = getChecked('fRamT');
@@ -489,11 +552,14 @@ function apply(){
   const ssds = getChecked('fSSD').map(Number);
   const cpus = getChecked('fCPU');
   const gpus = getChecked('fGPU');
+  const gpuModels = getChecked('fGPUModel');
+  const refreshRates = getChecked('fRefresh').map(Number);
   const modelQ = document.getElementById('fModel').value.trim().toLowerCase();
 
   filtered = all.filter(it=>{
     if(it.price!==null&&it.price!==undefined){ if(it.price<pMin||it.price>pMax) return false; }
     if(brands.length&&!brands.includes(it.brand)) return false;
+    if(cpuSeries.length&&!cpuSeries.includes(it.cpuSeries)) return false;
     if(screens.length&&!screens.includes(it.screenSize)) return false;
     if(ress.length&&!ress.includes(it.resolution)) return false;
     if(ramTs.length&&!ramTs.includes(it.ramType)) return false;
@@ -501,8 +567,11 @@ function apply(){
     if(ssds.length&&!ssds.includes(it.ssdSize)) return false;
     if(cpus.length&&!cpus.includes(it.cpuMfr)) return false;
     if(gpus.length&&!gpus.includes(it.gpuMfr)) return false;
+    if(gpuModels.length&&!gpuModels.includes(it.gpuModel)) return false;
+    if(refreshRates.length&&it.refreshRate&&!refreshRates.includes(it.refreshRate)) return false;
+    if(refreshRates.length&&!it.refreshRate) return false;
     if(modelQ){
-      const h = ((it.model||'')+' '+it.title+' '+it.desc).toLowerCase();
+      const h = ((it.model||'')+' '+it.title+' '+it.desc+' '+it.cpuModel+' '+it.gpuModel).toLowerCase();
       if(!h.includes(modelQ)) return false;
     }
     return true;
@@ -523,7 +592,13 @@ function apply(){
   render();
 }
 
-/* MEGJELENÍTÉS */
+function loadMore(){
+  displayCount += PAGE_SIZE;
+  render();
+  const btn = document.querySelector('.btn-load-more');
+  if(btn) btn.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
 function fmtPrice(p){
   if(!p&&p!==0) return 'Nincs ár';
   return p.toLocaleString('hu-HU')+' <span class="cur">Ft</span>';
@@ -551,8 +626,10 @@ function fmtTime(d){
 
 function render(){
   const c = document.getElementById('listC');
+  const total = filtered.length;
+  const shown = Math.min(displayCount, total);
   const updStr = lastUpdate ? '<span class="updated">(frissítve: '+fmtTime(lastUpdate)+')</span>' : '';
-  document.getElementById('rc').innerHTML = '<b>'+filtered.length+'</b> hirdetés '+updStr;
+  document.getElementById('rc').innerHTML = '<b>'+total+'</b> hirdetés'+(total !== shown ? ' <span style="color:var(--muted);font-weight:400">(megjelenítve: '+shown+')</span>' : '')+' '+updStr;
 
   if(!filtered.length && all.length){
     c.innerHTML = '<div class="empty"><i class="fas fa-filter"></i><h3>Nincs találat</h3><p>Próbáld meg lazítani a szűrőket.</p></div>';
@@ -560,33 +637,55 @@ function render(){
   }
 
   c.className = 'list'+(view==='grid'?' grid':'');
+  const pageItems = filtered.slice(0, displayCount);
 
-  c.innerHTML = filtered.map((it,i)=>{
+  let html = pageItems.map((it,i)=>{
     const bc = BC[it.brand]||'#444';
     const badges = [];
+
+    /* CPU badge */
     if(it.cpuModel) badges.push('<span class="bdg hi"><i class="fas fa-microchip"></i>'+it.cpuModel+'</span>');
+
+    /* GPU badge – mindig megjelenik, szín gyártó alapján */
+    if(it.gpuModel){
+      const gpuCls = gpuBadgeClass(it.gpuMfr, it.gpuModel);
+      badges.push('<span class="bdg '+gpuCls+'"><i class="fas fa-tv"></i>'+it.gpuModel+'</span>');
+    }
+
     if(it.ramSize) badges.push('<span class="bdg"><i class="fas fa-memory"></i>'+it.ramSize+'GB'+(it.ramType?' '+it.ramType:'')+'</span>');
     if(it.ssdSize) badges.push('<span class="bdg"><i class="fas fa-hdd"></i>'+fmtSSD(it.ssdSize)+' SSD</span>');
-    if(it.gpuModel&&it.gpuModel!=='Integrált') badges.push('<span class="bdg bl"><i class="fas fa-tv"></i>'+it.gpuModel+'</span>');
-    if(it.screenSize) badges.push('<span class="bdg"><i class="fas fa-desktop"></i>'+it.screenSize+'</span>');
+    if(it.refreshRate&&it.refreshRate>60) badges.push('<span class="bdg pk"><i class="fas fa-tachometer-alt"></i>'+it.refreshRate+'Hz</span>');
+    if(it.screenSize) badges.push('<span class="bdg"><i class="fas fa-desktop"></i>'+it.screenSize+'"</span>');
     if(it.resolution) badges.push('<span class="bdg"><i class="fas fa-expand"></i>'+it.resolution+'</span>');
     if(it.brand) badges.push('<span class="bdg gr"><i class="fas fa-building"></i>'+it.brand+'</span>');
 
-    const imgHtml = '<div class="ph" style="color:'+bc+'"><i class="fas fa-laptop"></i><small>'+(it.brand||'Laptop')+'</small></div>';
-    
+    const imgHtml = it.image
+      ? '<img src="'+it.image+'" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=ph style=color:'+bc+'><i class=fas fa-laptop></i><small>'+(it.brand||'Laptop')+'</small></div>\'">'
+      : '<div class="ph" style="color:'+bc+'"><i class="fas fa-laptop"></i><small>'+(it.brand||'Laptop')+'</small></div>';
+
     const sn = it.seller?it.seller.name:'';
     const sp = it.seller?it.seller.pos:0;
     const sn2 = it.seller?it.seller.neg:0;
     const tc = trustColor(sp,sn2);
     const sellerHtml = sn ? '<div class="card-seller"><i class="fas fa-user-circle" style="color:'+tc+';font-size:13px;flex-shrink:0"></i><span class="name" title="'+sn+'">'+sn+'</span>'+((sp||sn2)?'<span class="seller-ratings"><span class="pos">+'+sp+'</span><span class="sep">/</span><span class="neg">-'+sn2+'</span></span>':'')+'</div>' : '';
 
-    const origBtn = it.link ? '<a class="btn-original" href="'+it.link+'" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i>Eredeti hirdetés</a>' : '';
+    const origBtn = it.link ? '<a class="btn-original" href="'+it.link+'" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i>Eredeti</a>' : '';
 
     return '<div class="card" style="animation-delay:'+Math.min(i*25,500)+'ms"><div class="card-img">'+imgHtml+'</div><div class="card-body"><div class="card-title">'+it.title+'</div><div class="badges">'+badges.join('')+'</div>'+sellerHtml+'</div><div class="card-right"><div class="card-price">'+fmtPrice(it.price)+'</div>'+origBtn+'</div></div>';
   }).join('');
+
+  if(total > displayCount){
+    const remaining = total - displayCount;
+    const loadAmt = Math.min(PAGE_SIZE, remaining);
+    html += '<button class="btn-load-more" onclick="loadMore()"><i class="fas fa-angle-double-down"></i>Több betöltése<span class="remaining">('+loadAmt+' db, összesen '+remaining+')</span></button>';
+  }
+  if(total > PAGE_SIZE){
+    html += '<div class="page-info">'+shown+' / '+total+' hirdetés</div>';
+  }
+
+  c.innerHTML = html;
 }
 
-/* UI */
 function togF(el){ el.parentElement.classList.toggle('off'); }
 function togSB(){
   const sb=document.getElementById('sb'), ov=document.getElementById('sbOv');
@@ -621,7 +720,6 @@ function toast(msg,type){
   toastTimer=setTimeout(()=>el.classList.remove('show'),4500);
 }
 
-/* INDÍTÁS */
 doFetch();
 </script>
 </body>
