@@ -5,25 +5,18 @@ import re
 import time
 import random
 
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-    'Accept-Language': 'hu-HU,hu;q=0.9,en-US;q=0.8,en;q=0.7',
-    'DNT': '1',
-    'Connection': 'keep-alive',
-    'Upgrade-Insecure-Requests': '1',
-    'Sec-Fetch-Dest': 'document',
-    'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'same-origin',
-    'Sec-Fetch-User': '?1',
-}
+# User-Agent lista a kezdeti választáshoz
+USER_AGENTS = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.2420.81'
+]
 
 BASE_URL = 'https://hardverapro.hu/aprok/notebook/pc/index.html'
 MAX_PAGES = 5 
 
-# [Az extract_specs függvényed változatlanul ide jön]
 def extract_specs(title, desc):
-    # Szöveg tisztítása és vesszők cseréje pontra a számok környezetében
     txt = (title + ' ' + desc).replace('\xa0', ' ').replace('\t', ' ')
     t_lower = txt.lower()
     
@@ -47,20 +40,18 @@ def extract_specs(title, desc):
             s['brand'] = b.capitalize() if b != 'hp' else 'HP'
             break
 
-    # --- KIJELZŐ MÉRET (Fejlesztett felismerés) ---
-    # Figyeljük a: 15.6, 15,6, 14", 14col, 17.3-as, 13'3 formátumokat
-    # Első körben keressük a tizedesjegyessel rendelkezőket (pl. 15.6 vagy 15,6)
-    scr_complex = re.search(r'(\d{2}[.,]\d)\s*(?:"|col|''|\'|-as|-es|-os)', t_lower)
-    if scr_complex:
-        val = scr_complex.group(1).replace(',', '.')
-        s['screenSize'] = float(val)
-    else:
-        # Ha nincs tizedes, keressük a sima egész számokat (pl. 14", 16 col)
-        scr_simple = re.search(r'(\d{2})\s*(?:"|col|''|\'|-as|-es|-os)', t_lower)
-        if scr_simple:
-            s['screenSize'] = float(scr_simple.group(1))
+    # --- KIJELZŐ MÉRET (Védve a modellszámoktól: 10-21" tartomány) ---
+    screen_matches = re.finditer(r'(\d{2}(?:[.,]\d)?)\s*(?:"|col|''|\'|-as|-es|-os)', t_lower)
+    for m in screen_matches:
+        try:
+            val = float(m.group(1).replace(',', '.'))
+            if 10.0 <= val <= 21.0:
+                s['screenSize'] = val
+                break
+        except:
+            continue
 
-    # --- CPU FELISMERÉS ---
+    # --- CPU FELISMERÉS (Ultra, Ryzen AI/PRO, i-széria) ---
     if 'ultra' in t_lower:
         s['cpuMfr'] = 'Intel'
         m = re.search(r'ultra\s*([579])\s*([\w\d]+)', t_lower)
@@ -91,15 +82,12 @@ def extract_specs(title, desc):
     # --- RAM, GPU, TÁRHELY ---
     ram_m = re.search(r'(\d+)\s*gb', t_lower)
     if ram_m: s['ramSize'] = int(ram_m.group(1))
-    
     ram_t = re.search(r'ddr\s*([1-5])', t_lower)
     if ram_t: s['ramType'] = f"DDR{ram_t.group(1)}"
-    
     ssd_m = re.search(r'(\d+)\s*(gb|tb)\s*(ssd|nvme|m\.2)', t_lower)
     if ssd_m:
         size = int(ssd_m.group(1))
         s['ssdSize'] = size * 1024 if ssd_m.group(2) == 'tb' else size
-
     gpu_m = re.search(r'(rtx|gtx|rx)\s*(\d{3,4})', t_lower)
     if gpu_m:
         s['gpuMfr'] = 'NVIDIA' if gpu_m.group(1) != 'rx' else 'AMD'
@@ -107,11 +95,28 @@ def extract_specs(title, desc):
 
     return s
 
-
 def scrape():
     session = requests.Session()
-    session.headers.update(HEADERS)
-    session.headers.update({'Referer': 'https://www.google.hu/'})
+    
+    # User-Agent kiválasztása egyszer az induláskor
+    selected_ua = random.choice(USER_AGENTS)
+    
+    # Az összes kért fejléc beállítása
+    session.headers.update({
+        'User-Agent': selected_ua,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'hu-HU,hu;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+        'Cache-Control': 'max-age=0',
+        'Referer': 'https://www.google.com/' # Kezdő referer
+    })
     
     all_items = []
     seen_links = set()
@@ -119,14 +124,16 @@ def scrape():
     for page in range(MAX_PAGES):
         offset = page * 100
         url = f"{BASE_URL}?offset={offset}"
-        print(f"[{time.strftime('%H:%M:%S')}] {page+1}. oldal lekérése...")
+        print(f"[{time.strftime('%H:%M:%S')}] {page+1}. oldal lekérése... (Böngésző: {selected_ua[:25]}...)")
 
         try:
             resp = session.get(url, timeout=30)
+            
+            # Következő kéréshez az aktuális URL lesz a Referer
             session.headers.update({'Referer': url})
             
             if resp.status_code == 403:
-                print("Hiba: 403 Forbidden. Valószínűleg túl gyors voltál, vagy IP tiltás.")
+                print("Tiltás (403)! Az IP-d korlátozva lett.")
                 break
                 
             soup = BeautifulSoup(resp.text, 'html.parser')
@@ -165,12 +172,12 @@ def scrape():
                 })
 
         except Exception as e:
-            print(f"Hiba történt: {e}")
+            print(f"Hiba: {e}")
             break
         
         if page < MAX_PAGES - 1:
             wait_time = random.uniform(35, 65)
-            print(f"Biztonsági várakozás: {wait_time:.1f} mp...")
+            print(f"Várakozás {wait_time:.1f} másodpercig...")
             time.sleep(wait_time)
 
     with open('hirdetesek.json', 'w', encoding='utf-8') as f:
