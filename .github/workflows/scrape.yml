@@ -26,8 +26,19 @@ jobs:
       - name: Scrapelés
         # Először várunk véletlenszerűen 0-5 percet, csak utána indul a python
         run: |
-          sleep $((RANDOM % 300))
+          # Csak akkor várunk, ha az ütemező (cron) indította el a programot
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            WAIT_TIME=$((RANDOM % 300))
+            echo "⏰ Ütemezett futás: $WAIT_TIME másodperc várakozás a botvédelem miatt..."
+            sleep $WAIT_TIME
+          else
+            echo "🚀 Manuális indítás: Várakozás kihagyása, azonnali kezdés!"
+          fi
+          
+          # A -u kapcsoló miatt a print() parancsok azonnal látszódni fognak a konzolon!
           python -u scraper.py
+          #sleep $((RANDOM % 300))
+          #python -u scraper.py
 
       - name: Commit & Push
         run: |
