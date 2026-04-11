@@ -12,7 +12,7 @@ USER_AGENTS = [
 ]
 
 BASE_URL = 'https://hardverapro.hu/aprok/notebook/pc/index.html'
-MAX_PAGES = 1 # Javasolt csökkenteni a hosszú várakozási idők miatt!
+MAX_PAGES = 3 # Javasolt csökkenteni a hosszú várakozási idők miatt!
 
 def extract_specs(text_to_scan):
     t_lower = text_to_scan.lower().replace('\xa0', ' ').replace('\t', ' ')
