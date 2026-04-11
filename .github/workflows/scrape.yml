@@ -27,7 +27,7 @@ jobs:
         # Először várunk véletlenszerűen 0-5 percet, csak utána indul a python
         run: |
           sleep $((RANDOM % 300))
-          python scraper.py
+          python -u scraper.py
 
       - name: Commit & Push
         run: |
