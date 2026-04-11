@@ -2,9 +2,9 @@ name: Hardverapró Scraper
 
 on:
   schedule:
-    # Minden 6 órában fut (UTC szerint)
-    - cron: '0 */6 * * *'
-  workflow_dispatch: # Kézi indítás is
+    # 8 óránként fut, de eltolva a kerek időpontról (37. percben)
+    - cron: '37 */8 * * *'
+  workflow_dispatch: # Kézi indítás is marad
 
 permissions:
   contents: write
@@ -24,7 +24,10 @@ jobs:
         run: pip install requests beautifulsoup4
 
       - name: Scrapelés
-        run: python scraper.py
+        # Először várunk véletlenszerűen 0-5 percet, csak utána indul a python
+        run: |
+          sleep $((RANDOM % 300))
+          python scraper.py
 
       - name: Commit & Push
         run: |
