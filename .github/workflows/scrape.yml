@@ -21,7 +21,6 @@ jobs:
           python-version: '3.11'
 
       - name: Függőségek
-        run: pip install requests beautifulsoup4
         run: pip install requests beautifulsoup4 cloudscraper
 
       - name: Scrapelés
