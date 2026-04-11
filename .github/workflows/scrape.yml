@@ -22,6 +22,7 @@ jobs:
 
       - name: Függőségek
         run: pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4 cloudscraper
 
       - name: Scrapelés
         # Először várunk véletlenszerűen 0-5 percet, csak utána indul a python
