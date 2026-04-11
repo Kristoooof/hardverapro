@@ -582,7 +582,7 @@ function render(){
     const tc = trustColor(sp,sn2);
     const sellerHtml = sn ? '<div class="card-seller"><i class="fas fa-user-circle" style="color:'+tc+';font-size:13px;flex-shrink:0"></i><span class="name" title="'+sn+'">'+sn+'</span>'+((sp||sn2)?'<span class="seller-ratings"><span class="pos">+'+sp+'</span><span class="sep">/</span><span class="neg">-'+sn2+'</span></span>':'')+'</div>' : '';
 
-    const origBtn = it.link ? '<a class="btn-original" href="'+it.link+'" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>Eredeti hirdetés</a>' : '';
+    const origBtn = it.link ? '<a class="btn-original" href="'+it.link+'" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt"></i>Eredeti hirdetés</a>' : '';
 
     return '<div class="card" style="animation-delay:'+Math.min(i*25,500)+'ms"><div class="card-img">'+imgHtml+'</div><div class="card-body"><div class="card-title">'+it.title+'</div><div class="badges">'+badges.join('')+'</div>'+sellerHtml+'</div><div class="card-right"><div class="card-price">'+fmtPrice(it.price)+'</div>'+origBtn+'</div></div>';
   }).join('');
