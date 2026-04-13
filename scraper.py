@@ -13,7 +13,7 @@ USER_AGENTS = [
 ]
 
 BASE_URL = 'https://hardverapro.hu/aprok/notebook/pc/index.html'
-MAX_PAGES = 10
+MAX_PAGES = 5
 
 def extract_specs(text_to_scan):
     # Tisztítás és normalizálás
