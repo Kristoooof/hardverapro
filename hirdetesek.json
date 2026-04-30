@@ -38214,5 +38214,39 @@
     "ramSize": 24,
     "ramType": "DDR5",
     "ssdSize": 1024
+  },
+  {
+    "title": "Dell Latitude 5450 Újszerű, Ultra 5 135U, FHD IPS LCD,16GB, Magyar vil bill., gyári gar 2027.11-ig",
+    "link": "https://hardverapro.hu/apro/dell_latitude_5450_ujszeru_ultra_5_135u_fhd_ips_lc_2/friss.html",
+    "price": 239990,
+    "seller": "mbaluka",
+    "rating": "534 pozitív",
+    "timestamp": 1777523210.7907627,
+    "brand": "Dell",
+    "screenSize": 13.0,
+    "refreshRate": null,
+    "cpuMfr": "Intel",
+    "cpuModel": "I5-1345U",
+    "gpuModel": null,
+    "ramSize": 16,
+    "ramType": "DDR5",
+    "ssdSize": 256
+  },
+  {
+    "title": "11.Gen HP ProBook 650 G8,Intel Core i5-1135G7,4.20 GHz,16 GB RAM,256GB SSD,1920x1080 Matt,Win11PRO",
+    "link": "https://hardverapro.hu/apro/11_gen_hp_probook_650_g8_intel_core_i5-1135g7_4_20/friss.html",
+    "price": 100000,
+    "seller": "gyuszmo1",
+    "rating": "101 pozitív",
+    "timestamp": 1777523250.2555676,
+    "brand": "Dell",
+    "screenSize": 11.0,
+    "refreshRate": null,
+    "cpuMfr": "Intel",
+    "cpuModel": "I5-1135G7",
+    "gpuModel": null,
+    "ramSize": 16,
+    "ramType": "DDR4",
+    "ssdSize": 256
   }
 ]
