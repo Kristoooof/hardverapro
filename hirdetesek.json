@@ -57186,5 +57186,39 @@
     "ramSize": 16,
     "ramType": "DDR5",
     "ssdSize": 512
+  },
+  {
+    "title": "PRÉMIUM! Dell Latitude 5430, i5-1245U, 16GB/256GB, FHD/IPS, TOUCH, garancia, számla!",
+    "link": "https://hardverapro.hu/apro/premium_dell_latitude_5430_i5-1245u_16gb_256gb_fhd/friss.html",
+    "price": 134900,
+    "seller": "\"VAN MINDEN\"",
+    "rating": "770 pozitív",
+    "timestamp": 1779510687.0220993,
+    "brand": "Lenovo",
+    "screenSize": 12.0,
+    "refreshRate": null,
+    "cpuMfr": "Intel",
+    "cpuModel": "I5-1245U",
+    "gpuModel": null,
+    "ramSize": 16,
+    "ramType": null,
+    "ssdSize": 16
+  },
+  {
+    "title": "HP EliteBook X G1i 14\" Vadiúj",
+    "link": "https://hardverapro.hu/apro/toshiba_500gb_16mb_7200rpm_sata2_mq01acf050_2_5_hd/friss.html",
+    "price": 590000,
+    "seller": "5@$",
+    "rating": "192 pozitív",
+    "timestamp": 1779511039.8841152,
+    "brand": "HP",
+    "screenSize": 14.0,
+    "refreshRate": null,
+    "cpuMfr": "Ismeretlen",
+    "cpuModel": "",
+    "gpuModel": "ARC 140",
+    "ramSize": 32,
+    "ramType": null,
+    "ssdSize": 1024
   }
 ]
