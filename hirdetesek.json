@@ -67114,5 +67114,22 @@
     "ramSize": 16,
     "ramType": "DDR5",
     "ssdSize": 512
+  },
+  {
+    "title": "Dell,14\"FullHd IPS,core i5 8400H(8x4,2Ghz)MX 2/6GB VGA,8-32GB DDR4,Vil.bill,,256-512GB SSD,jó akku",
+    "link": "https://hardverapro.hu/apro/dell_14_fullhd_ips_core_i5_8400h_8x4_2ghz_mx_2_6gb/friss.html",
+    "price": 99800,
+    "seller": "EzAz@ Laptop",
+    "rating": "534 pozitív",
+    "timestamp": 1780115926.0972438,
+    "brand": "Dell",
+    "screenSize": 14.0,
+    "refreshRate": null,
+    "cpuMfr": "Intel",
+    "cpuModel": "I5-8400H",
+    "gpuModel": null,
+    "ramSize": 6,
+    "ramType": "DDR4",
+    "ssdSize": 512
   }
 ]
