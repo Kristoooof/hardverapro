@@ -81547,5 +81547,39 @@
     "ramSize": 16,
     "ramType": null,
     "ssdSize": 512
+  },
+  {
+    "title": "FUJITSU MADE IN JAPAN LIFEBOOK U7511 15\" 11. gen. ÚJ ÁRA 500.000.- felett volt!!!",
+    "link": "https://hardverapro.hu/apro/fujitsu_made_in_japan_lifebook_u7511_15_11_gen_uj/friss.html",
+    "price": 90000,
+    "seller": "kapu 2",
+    "rating": "1810 pozitív",
+    "timestamp": 1781154964.0974538,
+    "brand": "Lenovo",
+    "screenSize": 11.0,
+    "refreshRate": null,
+    "cpuMfr": "Intel",
+    "cpuModel": "I5-16GB-512-GB-SSD-WIN10P-1369010",
+    "gpuModel": null,
+    "ramSize": 16,
+    "ramType": null,
+    "ssdSize": null
+  },
+  {
+    "title": "HP Elitebook 840 G2 notebook, 16GB RAM, 256GB SSD, magyar bill. (40.000 Ft)",
+    "link": "https://hardverapro.hu/apro/hp_elitebook_840_g2_notebook_16gb_ram_256gb_ssd_ma/friss.html",
+    "price": 40000,
+    "seller": "Marengo",
+    "rating": "579 pozitív",
+    "timestamp": 1781155025.699154,
+    "brand": "HP",
+    "screenSize": 16.0,
+    "refreshRate": null,
+    "cpuMfr": "Intel",
+    "cpuModel": "I5-5200U",
+    "gpuModel": null,
+    "ramSize": 16,
+    "ramType": "DDR3",
+    "ssdSize": 256
   }
 ]
