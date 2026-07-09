@@ -108135,5 +108135,22 @@
     "ramSize": 8,
     "ramType": "DDR4",
     "ssdSize": 512
+  },
+  {
+    "title": "Dell Latitude 5520, Core i5-1135G7, 16GB DDR4, 256GB NVMe, Windows 11 Pro + táska SZÉP ÁLLAPOT!",
+    "link": "https://hardverapro.hu/apro/dell_latitude_5520_core_i5-1135g7_16gb_ddr4_256gb_2/friss.html",
+    "price": 120000,
+    "seller": "admin1221",
+    "rating": "58 pozitív",
+    "timestamp": 1783571925.2464628,
+    "brand": "Lenovo",
+    "screenSize": 20.0,
+    "refreshRate": null,
+    "cpuMfr": "Intel",
+    "cpuModel": "I5-1135G7",
+    "gpuModel": null,
+    "ramSize": 16,
+    "ramType": "DDR4",
+    "ssdSize": 256
   }
 ]
