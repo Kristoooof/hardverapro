@@ -115972,5 +115972,39 @@
     "ramSize": 64,
     "ramType": null,
     "ssdSize": 1024
+  },
+  {
+    "title": "Dobozos Asus VivoBook S 15 Laptop 15,6\" -35% Snapdragon X Plus 8 Mag 16/512 3K OLED 120Hz",
+    "link": "https://hardverapro.hu/apro/dobozos_asus_vivobook_s_15_laptop_15_6_30_snapdrag/friss.html",
+    "price": 229990,
+    "seller": "ZoltánZoltán",
+    "rating": "679 pozitív",
+    "timestamp": 1784434026.9539475,
+    "brand": "Dell",
+    "screenSize": 15.0,
+    "refreshRate": 120,
+    "cpuMfr": "Intel",
+    "cpuModel": "I7-1355U",
+    "gpuModel": null,
+    "ramSize": 16,
+    "ramType": "LPDDR5",
+    "ssdSize": 512
+  },
+  {
+    "title": "DELL XPS 15 9530 TERVEZŐ VÁGÓ Laptop -50% 15,6\" I7-13620H 16/1TB Intel Arc A370M 4GB FHD+",
+    "link": "https://hardverapro.hu/apro/dell_xps_15_9530_tervezo_vago_laptop_50_15_6_i7-13/friss.html",
+    "price": 359990,
+    "seller": "ZoltánZoltán",
+    "rating": "679 pozitív",
+    "timestamp": 1784434062.4503207,
+    "brand": "Dell",
+    "screenSize": 15.0,
+    "refreshRate": 60,
+    "cpuMfr": "Intel",
+    "cpuModel": "I7-13620H",
+    "gpuModel": null,
+    "ramSize": 4,
+    "ramType": null,
+    "ssdSize": 1024
   }
 ]
