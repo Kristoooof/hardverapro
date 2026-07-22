@@ -119440,5 +119440,22 @@
     "ramSize": 8,
     "ramType": null,
     "ssdSize": 256
+  },
+  {
+    "title": "Új Lenovo 16 Ideapad Pro 5 OLED 2.8K 120Hz Ryzen Ai 5 340 4.8Ghz 24GB 1TB Radeon 840M Win11 Garancia",
+    "link": "https://hardverapro.hu/apro/uj_lenovo_16_ideapad_pro_5_oled_2_8k_120hz_ryzen_a_2/friss.html",
+    "price": 299990,
+    "seller": "LigetComp",
+    "rating": "383 pozitív",
+    "timestamp": 1784692829.689218,
+    "brand": "Lenovo",
+    "screenSize": 16.0,
+    "refreshRate": 120,
+    "cpuMfr": "AMD",
+    "cpuModel": "RYZEN9-8940HX",
+    "gpuModel": "RADEON 840",
+    "ramSize": 24,
+    "ramType": "LPDDR5",
+    "ssdSize": 1024
   }
 ]
