@@ -130898,5 +130898,39 @@
     "ramSize": 32,
     "ramType": "DDR4",
     "ssdSize": 1024
+  },
+  {
+    "title": "HP Pavilion Gaming i7 / GTX 1660 Ti / 16 GB / 512 GB NVMe",
+    "link": "https://hardverapro.hu/apro/hp_pavilion_gaming_i7_gtx_1660_ti_16_gb_512_gb_nvm/friss.html",
+    "price": 159999,
+    "seller": "Narcos20",
+    "rating": "20 pozitív",
+    "timestamp": 1785643726.4963155,
+    "brand": "HP",
+    "screenSize": 16.0,
+    "refreshRate": 60,
+    "cpuMfr": "Intel",
+    "cpuModel": "I7-9750H",
+    "gpuModel": "GTX 1660 TI",
+    "ramSize": 16,
+    "ramType": null,
+    "ssdSize": 512
+  },
+  {
+    "title": "Lenovo Thinkpad P50, i7-6820HQ, 32GB/512GB, NVIDIA, FHD/IPS, garancia, számla!",
+    "link": "https://hardverapro.hu/apro/halozati_switch_akcio_tobb_db_egyben_hasznalt_nem/friss.html",
+    "price": 89900,
+    "seller": "\"VAN MINDEN\"",
+    "rating": "786 pozitív",
+    "timestamp": 1785643899.176886,
+    "brand": "Lenovo",
+    "screenSize": 20.0,
+    "refreshRate": null,
+    "cpuMfr": "Intel",
+    "cpuModel": "I7-6820HQ",
+    "gpuModel": null,
+    "ramSize": 32,
+    "ramType": null,
+    "ssdSize": 32
   }
 ]
